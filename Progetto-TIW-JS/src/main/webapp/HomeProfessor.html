@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Home</title>
+</head>
+<body>
+<h1>Welcome to the Professor's Home Page</h1>
+	<div id="id_alert" class="alertmessage"></div>	
+	<table>
+		<tr>
+			<td>
+				<ul id="id_courses">
+<!-- 					<li id="id_corso0">analisi
+						<ul>
+							<li>20/8/2023</li>
+						</ul>
+					</li> -->
+				</ul>				
+			</td>
+		</tr>
+		<tr>
+			<td>
+			
+			<table class="boxed">
+					<thead>
+						<tr> <th>Id number</th> <th>Name</th> <th>Surname</th> <th>E-mail</th> <th>Degree</th> <th>Mark</th> <th>Evaluation state</th></tr>
+					</thead>
+					<tbody id="id_registeredstudentscontainerbody">
+						<tr>
+							<td id="id_idnumber"></td>
+							<td id="id_name"></td>
+							<td id="id_surname"></td>
+							<td id="id_email"></td>
+							<td id="id_degree"></td>
+							<td id="id_mark"></td>
+							<td id="id_evaluationstate"></td>
+							<td>
+								<form id="id_modifybutton" action="#">
+									<input type="hidden" name="appealDate">
+									<input type="hidden" name="courseId">
+									<input type="hidden" name="studentId">
+									<input type="button" name="Modify" value="modify">
+							 	</form>	
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+			
+<!-- 			 <div class="boxed">
+			 <p>Create a new message: </p>
+			 <form id="id_expenseform" action="#">
+			   <p> Title: <input type="title"  name="title" /> </p>
+			   <p> Body: <input type="text" name="body"  /> </p>
+						<p> Date: <input type="date" name="date" /> </p>
+						<input name="topicid" type="hidden"	> 
+						<input type="button" name="Submit" value="submit">
+			 </form>
+			 </div>
+			<div id="id_msgcontainer">
+			<p> </p>
+			    <table class="boxed">
+					<thead>
+						<tr> <th>Title</th> <th>Body</th> <th>Date</th> </tr>
+					</thead>
+					<tbody id="id_msgcontainerbody">
+						<tr>
+							<td id="id_title"></td>
+							<td id="id_body"></td>
+							<td id="id_date"></td>
+						</tr>
+					</tbody>
+				</table>
+				</div> -->
+		</tr>
+	</table>
+</body>
+</html>

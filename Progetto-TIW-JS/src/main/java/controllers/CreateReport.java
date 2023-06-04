@@ -1,0 +1,183 @@
+package controllers;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.AppealDAO;
+import dao.ReportDAO;
+import javaBeans.Appeal;
+import javaBeans.Report;
+import javaBeans.User;
+
+/**
+ * Servlet implementation class CreateReport
+ */
+@WebServlet("/CreateReport")
+public class CreateReport extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	private Connection connection;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public CreateReport() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+    public void init() throws ServletException {
+		ServletContext servletContext = getServletContext();
+		try {
+			ServletContext context = getServletContext();
+			String driver = context.getInitParameter("dbDriver");
+			String url = context.getInitParameter("dbUrl");
+			String user = context.getInitParameter("dbUser");
+			String password = context.getInitParameter("dbPassword");
+			Class.forName(driver);
+			connection = DriverManager.getConnection(url, user, password);
+		} catch (ClassNotFoundException e) {
+			throw new UnavailableException("Can't load database driver");
+		} catch (SQLException e) {
+			throw new UnavailableException("Couldn't get db connection");
+		}
+	}
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String loginpath = getServletContext().getContextPath() + "/index.html";
+		User u = null;
+		HttpSession s = request.getSession();
+		if (s.isNew() || s.getAttribute("user") == null) {
+			response.sendRedirect(loginpath);
+			return;
+		} else {
+			u = (User) s.getAttribute("user");
+			if (!u.getRuolo().equals("docente")) {
+				response.sendRedirect(loginpath);
+				return;
+			}
+		}
+		Report newReport = null;
+		Appeal appeal = new Appeal();
+		ReportDAO reportDAO = new ReportDAO(connection);
+		AppealDAO appealDAO = new AppealDAO(connection);
+		String report = request.getParameter("idReport");
+		String corso = request.getParameter("idCorso");
+		String dataAppello = request.getParameter("dataAppello");
+		List<Appeal> appelliDocente = null;
+		List<Report> verbaliAppello = null;
+		
+		if(corso == null || dataAppello == null || report == null) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in creating report");
+			return;
+		}
+		try {
+			appeal.setData(Date.valueOf(dataAppello));
+			appeal.setIdCorso(Integer.parseInt(corso));
+			
+			//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello
+			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), Integer.parseInt(corso));
+			verbaliAppello = reportDAO.findReportByAppeal(appeal);
+			
+			newReport = reportDAO.findReportById(Integer.parseInt(report));
+			if(newReport == null) {
+				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
+				return;
+			}
+			if(!appelliDocente.contains(appeal) || !verbaliAppello.contains(newReport) ){
+				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessor");
+				return;
+			}
+		}catch (IllegalArgumentException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");
+			return;
+		}catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database extraction and of reportData");
+			return;
+		}
+		
+		String path = "/WEB-INF/Report.html";
+		ServletContext servletContext = getServletContext();
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String loginpath = getServletContext().getContextPath() + "/index.html";
+		User u = null;
+		HttpSession s = request.getSession();
+		if (s.isNew() || s.getAttribute("user") == null) {
+			response.sendRedirect(loginpath);
+			return;
+		} else {
+			u = (User) s.getAttribute("user");
+			if (!u.getRuolo().equals("docente")) {
+				response.sendRedirect(loginpath);
+				return;
+			}
+		}
+		ReportDAO reportDAO = new ReportDAO(connection);
+		AppealDAO appealDAO = new AppealDAO(connection);
+		Report newReport = null;
+		Appeal appeal = new Appeal();
+		String corso = request.getParameter("idCorso");
+		String dataAppello = request.getParameter("dataAppello");
+		List<Appeal> appelliDocente = null;
+		
+		if(corso == null || dataAppello == null) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in creating report");
+			return;
+		}
+		
+		try {
+			appeal.setData(Date.valueOf(dataAppello));
+			appeal.setIdCorso(Integer.parseInt(corso));
+			
+			//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello
+			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), Integer.parseInt(corso));
+			if(!appelliDocente.contains(appeal)){
+				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessor");
+				return;
+			}
+			
+			newReport = reportDAO.createReport(appeal);
+			
+			if(newReport == null) {
+				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
+				return;
+			}
+		}catch (IllegalArgumentException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");
+			return;
+		}catch (SQLException e) {
+			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database extraction and creatinig report");
+			return;
+		}
+		response.sendRedirect(getServletContext().getContextPath() + "/CreateReport?idReport="+newReport.getId() +"&idCorso="+corso+"&dataAppello="+dataAppello);
+		return;
+		
+	}
+
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
+	}
+}
