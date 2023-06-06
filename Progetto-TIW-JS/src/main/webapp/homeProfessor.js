@@ -1,6 +1,6 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
-	let coursesList, courseAppeals;
+	let coursesList, courseAppeals, studentsDetails;
 	
 	window.addEventListener("load", () => {
 	    if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -141,9 +141,7 @@
 	        anchor.setAttribute('appealdate', appeal.data); // set a custom HTML attribute
 	        anchor.addEventListener("click", (e) => {
 				// MOSTRO GLI ISCRITTI
-				//courseAppeals.listContainer = listEl;
-	          // dependency via module parameter
-	          //courseAppeals.show(e.target.getAttribute("courseid")); // the list must know the details container
+				studentsDetails.show(self.idCorso, appeal.data);
 	        }, false);
 	        anchor.href = "#";
 	        //self.listcontainer.appendChild(listEl);
@@ -152,6 +150,87 @@
 		};
 		
 		this.reset = function(){};
+	}
+	
+	function StudentsDetails(alert, registeredstudentscontainerbody){
+		this.alert = alert;
+		this.registeredstudentscontainerbody = registeredstudentscontainerbody;
+	    
+	    this.show = function(courseId, appealDate){
+			var self = this;
+	      makeCall("GET", "GetRegisteredStudentsByAppeal?idCorso=" + courseId + "&dataAppello=" + appealDate, null,
+	        function(req) {
+	          if (req.readyState == 4) {
+	            var message = req.responseText;
+	            if (req.status == 200) {
+	              var registeredStudents = JSON.parse(req.responseText);
+	              console.log(typeof registeredStudent);
+	              self.update(registeredStudents); // self is the object on which the function
+	              // is applied
+	              self.registeredstudentscontainer.style.visibility = "visible";
+
+/*	            PER IL PULSANTE MODIFICA  
+				switch (registeredStudents.evaluationstate) {
+	                case "OPEN":
+	                  self.expensecontainer.style.visibility = "hidden";
+	                  self.expenseform.style.visibility = "visible";
+	                  self.expenseform.missionid.value = mission.id;
+	                  self.closeform.style.visibility = "hidden";
+	                  break;
+	                case "REPORTED":
+	                  self.expensecontainer.style.visibility = "visible";
+	                  self.expenseform.style.visibility = "hidden";
+	                  self.closeform.missionid.value = mission.id;
+	                  self.closeform.style.visibility = "visible";
+	                  break;
+	                case "CLOSED":
+	                  self.expensecontainer.style.visibility = "visible";
+	                  self.expenseform.style.visibility = "hidden";
+	                  self.closeform.style.visibility = "hidden";
+	                  break;
+	              }*/
+	            } else if (req.status == 403) {
+                  window.location.href = req.getResponseHeader("Location");
+                  window.sessionStorage.removeItem('user');
+                  }
+                  else {
+	              self.alert.textContent = message;
+
+	            }
+	          }
+	        }
+	      );
+		};
+	    
+	    this.update = function(registeredStudentsMap){
+			var self = this;
+			
+			var newrow = document.createElement("tr");
+			this.registeredstudentscontainerbody.appendChild(newrow);
+			
+			registeredStudentsMap.forEach(function(student, mark){
+				var newrow = document.createElement("tr");
+				this.registeredstudentscontainerbody.appendChild(newrow);
+				
+				var newidnumber = document.createElement("td");
+				newidnumber.textContent = student.matricola;
+				var newname = document.createElement("td");
+				newname.textContent = student.nome;
+				var newsurname = document.createElement("td");
+				newsurname.textContent = student.cognome;
+				var newemail = document.createElement("td");
+				newemail.textContent = student.mail;
+				var newdegree = document.createElement("td");
+				newdegree.textContent = student.corsodilaurea;
+				var newmark = document.createElement("td");
+				newmark.textContent = mark.voto;
+				var newevaluationstate = document.createElement("td");
+				newevaluationstate.textContent = mark.statovalutazione;
+				
+				newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
+			})
+
+		};
 	}
 	
 	function PageOrchestrator(){
@@ -171,26 +250,10 @@
 	        document.getElementById("id_courses"));
 	       
 	      courseAppeals = new CourseAppeals(alertContainer);
+	      
+	      studentsDetails = new StudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"));
 
-/*	      missionDetails = new MissionDetails({ // many parameters, wrap them in an
-	        // object
-	        alert: alertContainer,
-	        detailcontainer: document.getElementById("id_detailcontainer"),
-	        expensecontainer: document.getElementById("id_expensecontainer"),
-	        expenseform: document.getElementById("id_expenseform"),
-	        closeform: document.getElementById("id_closeform"),
-	        date: document.getElementById("id_date"),
-	        destination: document.getElementById("id_destination"),
-	        status: document.getElementById("id_status"),
-	        description: document.getElementById("id_description"),
-	        country: document.getElementById("id_country"),
-	        province: document.getElementById("id_province"),
-	        city: document.getElementById("id_city"),
-	        fund: document.getElementById("id_fund"),
-	        food: document.getElementById("id_food"),
-	        accomodation: document.getElementById("id_accomodation"),
-	        transportation: document.getElementById("id_transportation")
-	      });
+/*	      
 	      missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
 
 	      wizard = new Wizard(document.getElementById("id_createmissionform"), alertContainer);

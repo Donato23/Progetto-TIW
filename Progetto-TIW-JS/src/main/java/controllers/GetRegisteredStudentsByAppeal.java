@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.google.gson.Gson;
+
 import dao.AppealDAO;
 import dao.ProfessorDAO;
 import javaBeans.Appeal;
@@ -85,64 +87,48 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 		Appeal appeal = new Appeal();
 		int idCorso;
 		Date appealDate = null;
-		String sortBy = null;
-		String order = null;
-		List<String> sortByWhitelist = new ArrayList<>();
-		List<String> orderWhitelist = new ArrayList<>();
-		sortByWhitelist.add("matricola");
-		sortByWhitelist.add("nome");
-		sortByWhitelist.add("cognome");
-		sortByWhitelist.add("email");
-		sortByWhitelist.add("corsodilaurea");
-		sortByWhitelist.add("voto");
-		sortByWhitelist.add("statovalutazione");
-		orderWhitelist.add("ASC");
-		orderWhitelist.add("DESC");
 		try {
 			String corso = request.getParameter("idCorso");
 			String appello = request.getParameter("dataAppello");
-			sortBy = request.getParameter("sortBy");
-			order = request.getParameter("order");
 			
-			if(appello != null && corso != null && sortBy != null && order != null) {
+			if(appello != null && corso != null) {
 				idCorso = Integer.parseInt(corso);
+				System.out.println(appello);
 				appealDate = Date.valueOf(appello);
 				
-				appeal.setData(appealDate);
+				appeal.setData(appello);
 				appeal.setIdCorso(idCorso);
 				
 				//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello
 				appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), idCorso);
 				
 				if(!appelliDocente.contains(appeal)){
-					response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessorAppeals?idCorso=" + corso);
-					return;
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					response.getWriter().println("Wrong parameter");
 				}
 				
-				if(!sortByWhitelist.contains(sortBy) || !orderWhitelist.contains(order)) {
-					response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+appello+"&sortBy=matricola&order=ASC");
-					return;
-				}
-				
-				registeredStudentsEvaluations = professorDAO.findRegisteredStudentsByAppeal(idCorso, appealDate, sortBy, order);
+				registeredStudentsEvaluations = professorDAO.findRegisteredStudentsByAppeal(idCorso, appealDate);
 			}
 			else {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter");
-				return;
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Missing parameters");
 			}
 			
 	
 		}catch(IllegalArgumentException e){
-			response.getWriter().append("PAR ERROR: parameter is not valid");
-			return;
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: parameter is not valid");
 		}
 		catch (SQLException e) {
 			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database extraction");
-			return;
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Failure in database extraction");
 		}
-		String path = "/WEB-INF/RegisteredStudents.html";
-		ServletContext servletContext = getServletContext();
+		String json = new Gson().toJson(registeredStudentsEvaluations);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	/**

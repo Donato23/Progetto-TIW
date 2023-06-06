@@ -50,8 +50,8 @@ public class ProfessorDAO {
 		}
 	}
 	
-	public Map<User, Mark> findRegisteredStudentsByAppeal(int courseId, Date appealDate, String sortBy, String order) throws SQLException{		
-		String query = "SELECT * FROM iscritto, utente WHERE matricolastudente = matricola AND appello = ? AND corso = ? ORDER BY ";
+	public Map<User, Mark> findRegisteredStudentsByAppeal(int courseId, Date appealDate) throws SQLException{		
+		String query = "SELECT * FROM iscritto, utente WHERE matricolastudente = matricola AND appello = ? AND corso = ?";
 		// Using LinkedHashMap to keep insertion order
 		Map<User, Mark> registeredStudents = new LinkedHashMap<>();
 		PreparedStatement pstatement = null;
@@ -61,7 +61,7 @@ public class ProfessorDAO {
 		Mark mark = null;
 		
 		try{			
-			pstatement = con.prepareStatement(query + sortBy + " " + order);
+			pstatement = con.prepareStatement(query);
 			pstatement.setDate(1, appealDate);
 			pstatement.setInt(2, courseId);
 			

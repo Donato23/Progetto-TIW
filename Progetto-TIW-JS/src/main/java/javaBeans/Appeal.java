@@ -1,21 +1,19 @@
 package javaBeans;
 
-import java.sql.Date;
-
 
 public class Appeal {
 	private int idCorso;
-	private Date data;
+	private String data;
 	public int getIdCorso() {
 		return idCorso;
 	}
 	public void setIdCorso(int idCorso) {
 		this.idCorso = idCorso;
 	}
-	public Date getData() {
+	public String getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(String data) {
 		this.data = data;
 	}
 	@Override

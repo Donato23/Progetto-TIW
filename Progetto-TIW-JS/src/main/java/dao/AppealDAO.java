@@ -30,7 +30,7 @@ public class AppealDAO {
 			while (result.next()) {
 				a = new Appeal();
 				a.setIdCorso(result.getInt("corso"));
-				a.setData(result.getDate("appello"));
+				a.setData(result.getDate("appello").toString());
 				listOfAppeals.add(a);
 			}
 		} catch (SQLException e) {
@@ -69,7 +69,7 @@ public class AppealDAO {
 			while (result.next()) {
 				a = new Appeal();
 				a.setIdCorso(result.getInt("idcorso"));
-				a.setData(result.getDate("data"));
+				a.setData(result.getDate("data").toString());
 				listOfAppeals.add(a);
 			}
 		} catch (SQLException e) {
