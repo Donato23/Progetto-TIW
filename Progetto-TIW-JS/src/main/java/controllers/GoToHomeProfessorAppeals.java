@@ -9,11 +9,14 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
 
 import dao.AppealDAO;
 import dao.CourseDAO;
@@ -25,6 +28,7 @@ import javaBeans.User;
  * Servlet implementation class GoToHomeProfessorAppeals
  */
 @WebServlet("/GoToHomeProfessorAppeals")
+@MultipartConfig
 public class GoToHomeProfessorAppeals extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -85,7 +89,8 @@ public class GoToHomeProfessorAppeals extends HttpServlet {
 				
 				corsi = courseDAO.findCoursesByProfessor(u.getMatricola());
 				if (!corsi.stream().mapToInt(c -> c.getId()).anyMatch(i -> i == idCorso)) {//docente insegna quel corso
-					response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessor");
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					response.getWriter().println("Professor does not teach this course");
 					return;
 				}
 				
@@ -93,20 +98,25 @@ public class GoToHomeProfessorAppeals extends HttpServlet {
 				courseName = courseDAO.findCoursesByID(idCorso).getNome();
 				//controllo che il corso sia del professore
 			}else {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter");
-				return;
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().println("Missing parameters");
 			}
 			
 			
 		}catch(NumberFormatException e){
-			response.getWriter().append("PAR ERROR: parameter is not valid");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: parameter is not valid");
 		}
 		catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in professor's appeals database extraction");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Database access failed");
 		}
-		String path = "/WEB-INF/HomeProfessorAppeals.html";
-		ServletContext servletContext = getServletContext();
+		
+		String json = new Gson().toJson(appelli);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	/**

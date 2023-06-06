@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import javaBeans.User;
  * Servlet implementation class GoToHomeProfessor
  */
 @WebServlet("/GoToHomeProfessor")
+@MultipartConfig
 public class GoToHomeProfessor extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -65,7 +67,7 @@ public class GoToHomeProfessor extends HttpServlet {
 				return;
 			}
 		}
-
+		
 		CourseDAO cDao = new CourseDAO(connection);
 		List<Course> courses = new ArrayList<>();
 
@@ -73,14 +75,13 @@ public class GoToHomeProfessor extends HttpServlet {
 		try {
 			courses = cDao.findCoursesByProfessor(u.getMatricola());
 
-			String path = "/WEB-INF/HomeProfessorCourses.html";
-			ServletContext servletContext = getServletContext();
-
 		} catch (SQLException e) {
-			res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database access failed");
+			res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			res.getWriter().println("Database access failed");
 		}
 		
 		String json = new Gson().toJson(courses);
+		res.setStatus(HttpServletResponse.SC_OK);
 		res.setContentType("application/json");
 		res.setCharacterEncoding("UTF-8");
 		res.getWriter().write(json);

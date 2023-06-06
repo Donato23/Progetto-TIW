@@ -2,18 +2,23 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Home</title>
+<title>Professor's home</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<script src="homeProfessor.js" charset="utf-8" defer></script>
+<script src="utils.js" charset="utf-8" defer></script>
 </head>
 <body>
 <h1>Welcome to the Professor's Home Page</h1>
+	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
 	<div id="id_alert" class="alertmessage"></div>	
 	<table>
 		<tr>
 			<td>
+				<p>These are your courses:</p>
 				<ul id="id_courses">
-<!-- 					<li id="id_corso0">analisi
+<!-- 					<li id="id_corso0"><a>analisi</a>
 						<ul>
-							<li>20/8/2023</li>
+							<li><a>20/8/2023</a></li>
 						</ul>
 					</li> -->
 				</ul>				
@@ -22,7 +27,7 @@
 		<tr>
 			<td>
 			
-			<table class="boxed">
+			<table class="boxed" style="visibility: hidden;">
 					<thead>
 						<tr> <th>Id number</th> <th>Name</th> <th>Surname</th> <th>E-mail</th> <th>Degree</th> <th>Mark</th> <th>Evaluation state</th></tr>
 					</thead>

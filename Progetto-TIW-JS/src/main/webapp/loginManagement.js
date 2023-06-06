@@ -10,11 +10,12 @@
       makeCall("POST", 'Login', e.target.closest("form"),
         function(req) {
           if (req.readyState == XMLHttpRequest.DONE) {
-            var message = JSON.parse(req.responseText);
+            var message = req.responseText;
             switch (req.status) {
               case 200:
-            	sessionStorage.setItem('user', message);
-            	if(message.ruolo === "studente"){
+				var parsedMessage = JSON.parse(message);
+            	sessionStorage.setItem('user', message); // in sessionStorage ci possono essere solo le stringhe
+            	if(parsedMessage.ruolo === "studente"){
                 	window.location.href = "HomeStudent.html";
                 }else{
 					window.location.href = "HomeProfessor.html";
