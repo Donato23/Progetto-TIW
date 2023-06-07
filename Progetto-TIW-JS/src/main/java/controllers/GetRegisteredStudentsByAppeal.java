@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import dao.AppealDAO;
 import dao.ProfessorDAO;
@@ -124,7 +125,16 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Failure in database extraction");
 		}
-		String json = new Gson().toJson(registeredStudentsEvaluations);
+		//String json = new Gson().toJson(registeredStudentsEvaluations);
+		Gson gson = new Gson();
+		JsonObject jsonObject = new JsonObject();
+		for (Map.Entry<User, Mark> entry : registeredStudentsEvaluations.entrySet()) {
+			JsonObject entryObject = new JsonObject();
+			entryObject.addProperty("key", gson.toJson(entry.getKey()));
+			entryObject.addProperty("value", gson.toJson(entry.getValue()));
+			jsonObject.add(gson.toJson(entry.getKey()), entryObject);
+		}
+		String json = gson.toJson(jsonObject);
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

@@ -31,7 +31,7 @@ public class ProfessorDAO {
 			pstatement = con.prepareStatement(query);
 			pstatement.setString(1, voto);
 			pstatement.setInt(2, studentId);
-			pstatement.setDate(3, appeal.getData());
+			pstatement.setString(3, appeal.getData());
 			pstatement.setInt(4, appeal.getIdCorso());
 			
 			pstatement.executeUpdate();
@@ -111,7 +111,7 @@ public class ProfessorDAO {
 		
 		try{
 			pstatement = con.prepareStatement(query);
-			pstatement.setDate(1, appeal.getData());
+			pstatement.setString(1, appeal.getData());
 			pstatement.setInt(2, appeal.getIdCorso());
 			
 			pstatement.executeUpdate();
