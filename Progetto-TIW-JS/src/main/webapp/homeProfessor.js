@@ -1,6 +1,6 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
-	let coursesList, courseAppeals, studentsDetails;
+	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails;
 
 	window.addEventListener("load", () => {
 		if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -16,6 +16,9 @@
 		this.message = _message;
 		this.show = function() {
 			messagecontainer.textContent = this.message;
+		}
+		this.refresh = function(){
+			messagecontainer.textContent = "";
 		}
 	}
 
@@ -107,6 +110,10 @@
 								self.alert.textContent = "No appeals for this course!";
 								return;
 							}
+							
+							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
+							
+							self.alert.textContent = "";
 							self.update(appealsToShow); // self visible by closure
 							//if (next) next(); // show the default element of the list if present
 
@@ -143,7 +150,7 @@
 				anchor.setAttribute('appealdate', appeal.data); // set a custom HTML attribute
 				anchor.addEventListener("click", (e) => {
 					// MOSTRO GLI ISCRITTI
-					studentsDetails.show(self.idCorso, appeal.data);
+					registeredStudentsDetails.show(self.idCorso, appeal.data);
 				}, false);
 				anchor.href = "#";
 				//self.listcontainer.appendChild(listEl);
@@ -155,8 +162,8 @@
 	}
 	
 
-	function StudentsDetails(alert, registeredstudentscontainerbody, registeredstudentscontainer) {
-		this.alert = alert;
+	function RegisteredStudentsDetails(_alert, registeredstudentscontainerbody, registeredstudentscontainer) {
+		this.alert = _alert;
 		this.registeredstudentscontainerbody = registeredstudentscontainerbody;
 		this.registeredstudentscontainer = registeredstudentscontainer;
 		this.registeredStudentsString;
@@ -169,11 +176,7 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var obj = JSON.parse(req.responseText);
-							
-							if (obj.length == 0) {
-								self.alert.textContent = "No registered students for this appeal!";
-								return;
-							}
+							var objLength = 0;
 							
 							// Crea un oggetto JavaScript vuoto per conservare gli oggetti ricostruiti
 							var reconstructedRegisteredStudents = {};
@@ -181,6 +184,7 @@
 							// Scorrere tutte le chiavi nell'oggetto JSON
 							for (var key in obj) {
 								if (obj.hasOwnProperty(key)) {
+									objLength += 1;
 									var entry = obj[key];
 									var originalKey = JSON.parse(entry.key);
 									var value = JSON.parse(entry.value);
@@ -188,31 +192,21 @@
 									reconstructedRegisteredStudents[JSON.stringify(originalKey)] = value;
 								}
 							}
+							
+							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
+														
+							if (objLength == 0) {
+								if(self.registeredStudentsString != undefined){
+									self.registeredstudentscontainer.style.visibility = "hidden";
+									self.registeredStudentsString.refresh();
+								}
+								self.alert.textContent = "No registered students for this appeal!";
+								return;
+							}
 
-							self.update(reconstructedRegisteredStudents, appealDate); // self is the object on which the function
-							// is applied
+							self.alert.textContent = "";
+							self.update(reconstructedRegisteredStudents, appealDate, courseId);
 							self.registeredstudentscontainer.style.visibility = "visible";
-
-							/*	            PER IL PULSANTE MODIFICA  
-											switch (registeredStudents.evaluationstate) {
-												case "OPEN":
-												  self.expensecontainer.style.visibility = "hidden";
-												  self.expenseform.style.visibility = "visible";
-												  self.expenseform.missionid.value = mission.id;
-												  self.closeform.style.visibility = "hidden";
-												  break;
-												case "REPORTED":
-												  self.expensecontainer.style.visibility = "visible";
-												  self.expenseform.style.visibility = "hidden";
-												  self.closeform.missionid.value = mission.id;
-												  self.closeform.style.visibility = "visible";
-												  break;
-												case "CLOSED":
-												  self.expensecontainer.style.visibility = "visible";
-												  self.expenseform.style.visibility = "hidden";
-												  self.closeform.style.visibility = "hidden";
-												  break;
-											  }*/
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
 							window.sessionStorage.removeItem('user');
@@ -226,20 +220,20 @@
 			);
 		};
 
-		this.update = function(registeredStudentsMap, appealDate) {
+		this.update = function(registeredStudentsMap, appealDate, courseId) {
 			var self = this;
 			
-			while (self.registeredstudentscontainerbody.firstChild) {
-			  self.registeredstudentscontainerbody.removeChild(self.registeredstudentscontainerbody.firstChild);
+			while (this.registeredstudentscontainerbody.firstChild) {
+			  this.registeredstudentscontainerbody.removeChild(this.registeredstudentscontainerbody.firstChild);
 			}
 
-			self.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
+			this.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
 					document.getElementById("id_registeredstudentsstring"));
-			self.registeredStudentsString.show();
+			this.registeredStudentsString.show();
 
 			var originalStudent;
 			for (var user in registeredStudentsMap) {
-				if (registeredStudentsMap.hasOwnProperty(user)) {
+				if (registeredStudentsMap.hasOwnProperty(user)) {					
 					originalStudent = JSON.parse(user);
 					var newrow = document.createElement("tr");
 					this.registeredstudentscontainerbody.appendChild(newrow);
@@ -259,12 +253,91 @@
 					newevaluationstate.textContent = registeredStudentsMap[user].statoValutazione;
 
 					newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
-					self.registeredstudentscontainerbody.appendChild(newrow);
+					
+					// Se è possibile modificare il voto dello studente, aggiungo il pulsane modifica
+					if(registeredStudentsMap[user].statoValutazione === "INSERITO" || registeredStudentsMap[user].statoValutazione === "NON_INSERITO"){
+						var newButton = document.createElement("td");
+						var newForm = document.createElement("form");
+						newForm.setAttribute("id", "id_modifybutton")
+						newForm.setAttribute("action", "#");
+						var newInputAppealDate = document.createElement("input");
+						newInputAppealDate.setAttribute("type", "hidden");
+						newInputAppealDate.setAttribute("name", "appealDate");
+						newInputAppealDate.value = appealDate;
+						var newInputCourseId = document.createElement("input");
+						newInputCourseId.setAttribute("type", "hidden");
+						newInputCourseId.setAttribute("name", "courseId");
+						newInputCourseId.value = courseId;
+						var newInputStudentId = document.createElement("input");
+						newInputStudentId.setAttribute("type", "hidden");
+						newInputStudentId.setAttribute("name", "studentId");
+						newInputStudentId.value = originalStudent.matricola;
+						var newInputModify = document.createElement("input");
+						newInputModify.setAttribute("type", "button");
+						newInputModify.setAttribute("name", "Modify");
+						newInputModify.setAttribute("value", "Modify");
+						
+						newInputModify.addEventListener("click",  function(e) { // called when one clicks the button
+					        let form = e.target.closest("form"); // example of DOM navigation from event object
+					        if (form.checkValidity()) {
+					          let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
+					          let courseId = form.querySelector("input[type = 'hidden'][name = 'courseId']").value;
+					          let studentId = form.querySelector("input[type = 'hidden'][name = 'studentId']").value;
+					          
+					          e.preventDefault();
+					          
+					          makeCall("GET", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + studentId, form,
+					            function(req) {
+					              if (req.readyState === 4) { // response has arrived
+					                let message = req.responseText; // get the body of the response
+					                if (req.status === 200) { // if no errors
+					                  singleStudentDetails.update(JSON.parse(message));
+					                } else {
+					                  self.alert.textContent = message; // report the error contained in the response body
+					                }
+					              }
+					            }
+					          );
+					        } else {
+					          form.reportValidity(); // trigger the client-side HTML error messaging
+					        }
+						}, false);
+						
+						newForm.append(newInputAppealDate, newInputCourseId, newInputStudentId, newInputModify);
+						newButton.appendChild(newForm);
+						newrow.appendChild(newButton);
+					}
+					
+					this.registeredstudentscontainerbody.appendChild(newrow);
 
 				}
 			}
 
 		};
+	}
+	
+	function SingleStudentDetails(alert, studentDetailsContainer){
+		this.alert = alert;
+		this.studentDetailsContainer = studentDetailsContainer;
+		
+		this.update = function(studentDetails){
+			// setting visibility
+			this.studentDetailsContainer.style.visibility = "visible";
+			
+			//setting student's data
+			document.getElementById("id_studentid").textContent = studentDetails.matricola;
+			document.getElementById("id_studentname").textContent = studentDetails.nome;
+			document.getElementById("id_studentsurname").textContent = studentDetails.cognome;
+			document.getElementById("id_studentemail").textContent = studentDetails.mail;
+			document.getElementById("id_studentdegreecourse").textContent = studentDetails.corsoDiLaurea;
+			
+			// adding event listener for evaluation submit
+			document.getElementById("id_modifyevaluationbutton").addEventListener("click", function(e){
+				console.log("ciaoo");
+			});
+		};
+		
+		this.register = function(){};
 	}
 
 	function PageOrchestrator() {
@@ -285,8 +358,10 @@
 
 			courseAppeals = new CourseAppeals(alertContainer);
 
-			studentsDetails = new StudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"), document.getElementById("id_registeredstudentscontainer"));
+			registeredStudentsDetails = new RegisteredStudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"), document.getElementById("id_registeredstudentscontainer"));
 
+			singleStudentDetails = new SingleStudentDetails(alertContainer, document.getElementById("id_studentdetailscontainer"));
+			
 			/*	      
 					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
 			
@@ -298,7 +373,7 @@
 					  })*/
 		};
 
-		this.refresh = function(currentMission) { // currentMission initially null at start
+		this.refresh = function(currentCourse) { // currentMission initially null at start
 			alertContainer.textContent = "";        // not null after creation of status change
 			coursesList.reset();
 			courseAppeals.reset();

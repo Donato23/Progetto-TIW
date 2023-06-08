@@ -8,4 +8,5 @@ th.sortable {
 
 .alertmessage{
 	color: red;
+	visibility: visible;
 }

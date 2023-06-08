@@ -26,8 +26,8 @@
 		</tr>
 		<tr>
 			<td>
-			<p><span id="id_registeredstudentsstring"></span></p>
-			<table border="1" id="id_registeredstudentscontainer" class="boxed" style="visibility: hidden;">
+				<p><span id="id_registeredstudentsstring"></span></p>
+				<table id="id_registeredstudentscontainer" class="boxed" style="visibility: hidden;">
 					<thead>
 						<tr> <th>Id number</th> <th>Name</th> <th>Surname</th> <th>E-mail</th> <th>Degree</th> <th>Mark</th> <th>Evaluation state</th></tr>
 					</thead>
@@ -52,32 +52,40 @@
 					</tbody>
 				</table>
 			</td>
-			
-<!-- 			 <div class="boxed">
-			 <p>Create a new message: </p>
-			 <form id="id_expenseform" action="#">
-			   <p> Title: <input type="title"  name="title" /> </p>
-			   <p> Body: <input type="text" name="body"  /> </p>
-						<p> Date: <input type="date" name="date" /> </p>
-						<input name="topicid" type="hidden"	> 
-						<input type="button" name="Submit" value="submit">
-			 </form>
-			 </div>
-			<div id="id_msgcontainer">
-			<p> </p>
-			    <table class="boxed">
-					<thead>
-						<tr> <th>Title</th> <th>Body</th> <th>Date</th> </tr>
-					</thead>
-					<tbody id="id_msgcontainerbody">
-						<tr>
-							<td id="id_title"></td>
-							<td id="id_body"></td>
-							<td id="id_date"></td>
-						</tr>
-					</tbody>
-				</table>
-				</div> -->
+		</tr>
+		<tr id="id_studentdetailscontainer" style="visibility: hidden;">
+			<td>
+				<h2>Student details:</h2>
+				<p>Student ID: <span id="id_studentid"></span></p>
+				<p>Name: <span id="id_studentname"></span></p>
+				<p>Surname: <span id="id_studentsurname"></span></p>
+				<p>E-Mail: <span id="id_studentemail"></span></p>
+				<p>Degree course: <span id="id_studentdegreecourse"></span></p>
+				<h3>Insert the evaluation below:</h3>
+					<form id="id_modifyevaluationform" action="#">
+						<select name="evaluation">
+							<option></option>
+							<option>ASSENTE</option>
+							<option>RIMANDATO</option>
+							<option>RIPROVATO</option>
+							<option>18</option>
+							<option>19</option>
+							<option>20</option>
+							<option>21</option>
+							<option>22</option>
+							<option>23</option>
+							<option>24</option>
+							<option>25</option>
+							<option>26</option>
+							<option>27</option>
+							<option>28</option>
+							<option>29</option>
+							<option>30</option>
+							<option>30L</option>
+						</select> <br> 
+						<input id="id_modifyevaluationbutton" type="button" name="submit" value="Submit changes">
+					</form>
+			</td>
 		</tr>
 	</table>
 </body>

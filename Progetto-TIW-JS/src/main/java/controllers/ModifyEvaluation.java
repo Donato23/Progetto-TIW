@@ -10,11 +10,14 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
 
 import dao.AppealDAO;
 import dao.ProfessorDAO;
@@ -27,6 +30,7 @@ import javaBeans.User;
  * Servlet implementation class PublishEvaluation
  */
 @WebServlet("/ModifyEvaluation")
+@MultipartConfig
 public class ModifyEvaluation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -73,25 +77,28 @@ public class ModifyEvaluation extends HttpServlet {
 		String sId = request.getParameter("studentId");
 		String appealDate = request.getParameter("appealDate");
 		String courseId = request.getParameter("courseId");
+		
 		if(sId == null || appealDate == null || courseId == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in evaluation publication");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Missing parameters");
 			return;
 		}
 		
 		int studentId;
-		Date dataAppello = null;
+		//Date dataAppello = null;
 		int idCorso;
 		List<Appeal> appelliDocente = null;
 		AppealDAO appealDAO = new AppealDAO(connection);
 		Appeal appeal = new Appeal();
 		try {
 			studentId = Integer.parseInt(sId);
-			dataAppello = Date.valueOf(appealDate);
+			//dataAppello = Date.valueOf(appealDate);
 			idCorso = Integer.parseInt(courseId);
-			appeal.setData(dataAppello);
+			appeal.setData(appealDate);
 			appeal.setIdCorso(idCorso);
 		}catch (IllegalArgumentException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter is not valid");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Bad parameter - Parameter is not valid");
 			return;
 		}
 		
@@ -101,26 +108,33 @@ public class ModifyEvaluation extends HttpServlet {
 			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), idCorso);
 			
 			if(!appelliDocente.contains(appeal)){
-				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?dataAppello=" + appeal.getData() + "&idCorso=" + appeal.getIdCorso() + "&sortBy=matricola&order=ASC");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No appeals on this date for this course");
 				return;
 			}
 			
 			student = studentDao.findStudentById(studentId);
 			if(student.getRuolo().equals("docente")) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter must be a student ID");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Parameter must be a student ID");
 				return;
 			}
 			if(!studentDao.registeredForAppeal(studentId, appeal)) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "StudentId must be of a registered student");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("StudentId must be of a registered student");
 				return;
 			}
 		}catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure of student search in database");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure of student search in database");
 			return;
 		}
 		
-		String path = "/WEB-INF/ModifyStudentEvaluation.html";
-		ServletContext servletContext = getServletContext();
+		String json = new Gson().toJson(student);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -155,7 +169,8 @@ public class ModifyEvaluation extends HttpServlet {
 			
 			if(appello != null && corso != null && mStu != null && evaluation != null) {
 				selAppeal.setIdCorso(Integer.parseInt(corso));
-				selAppeal.setData(Date.valueOf(appello));
+				//selAppeal.setData(Date.valueOf(appello));
+				selAppeal.setData(appello);
 				studentId = Integer.parseInt(mStu);
 			}else {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in evaluation publication");
@@ -166,7 +181,7 @@ public class ModifyEvaluation extends HttpServlet {
 					evaluation.equals("RIMANDATO") || evaluation.equals("RIPROVATO") || evaluation.equals("30L"))) {
 				mark = Integer.parseInt(evaluation);
 				if(mark < 18 || mark > 30) {
-					response.getWriter().append("PAR ERROR: Parameter is not valid");
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "PAR ERROR: Parameter is not valid");
 					return;
 				}
 			}

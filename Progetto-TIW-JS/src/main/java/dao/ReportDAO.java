@@ -25,7 +25,7 @@ public class ReportDAO {
 	
 	public Report createReport(Appeal appello) throws SQLException {
 		int idCorso = appello.getIdCorso();
-		Date dataAppello = appello.getData();
+		String dataAppello = appello.getData();
 		
 		int codiceVerbale;
 		Date dataVerbale = Date.valueOf(LocalDate.now());
@@ -73,14 +73,14 @@ public class ReportDAO {
 			pstatement2 = con.prepareStatement(query2);
 			pstatement2.setInt(1, codiceVerbale);
 			pstatement2.setInt(2, idCorso);
-			pstatement2.setDate(3, dataAppello);
+			pstatement2.setString(3, dataAppello);
 			pstatement2.executeUpdate();
 			
 			// update statovalutazione e aggiungo codiceVerbale in iscritto per i voti rifiutati
 			pstatement3 = con.prepareStatement(query3);
 			pstatement3.setInt(1, codiceVerbale);
 			pstatement3.setInt(2, idCorso);
-			pstatement3.setDate(3, dataAppello);
+			pstatement3.setString(3, dataAppello);
 			pstatement3.executeUpdate();
 			
 			// trovo i dati degli studenti da mostrare nel verbale
@@ -119,7 +119,7 @@ public class ReportDAO {
 	
 	public List<Report> findReportByAppeal(Appeal appello) throws SQLException{
 		int idCorso = appello.getIdCorso();
-		Date dataAppello = appello.getData();
+		String dataAppello = appello.getData();
 		Map<User,String> datiVerbale= null;
 		List<Report> reports = new ArrayList<>();
 		Report report = null;
@@ -134,7 +134,7 @@ public class ReportDAO {
 		try {
 			pstatement = con.prepareStatement(query);
 			pstatement.setInt(1, idCorso);
-			pstatement.setDate(2, dataAppello);
+			pstatement.setString(2, dataAppello);
 			result = pstatement.executeQuery();
 			
 			while(result.next()) {

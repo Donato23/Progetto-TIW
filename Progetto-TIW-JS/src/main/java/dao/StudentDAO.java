@@ -61,7 +61,7 @@ public class StudentDAO {
 	public Mark findEvaluationByAppeal(int matricolaStudente, Appeal appello) throws SQLException{
 		Mark mark = null;
 		int idCorso = appello.getIdCorso();
-		Date data = appello.getData();
+		String data = appello.getData();
 		String query = "SELECT voto,statovalutazione FROM iscritto WHERE (statovalutazione = 'PUBBLICATO' "
 				+ "OR statovalutazione = 'RIFIUTATO' "
 				+ "OR statovalutazione = 'VERBALIZZATO')"
@@ -72,7 +72,7 @@ public class StudentDAO {
 			pstatement = con.prepareStatement(query);
 			pstatement.setInt(1, matricolaStudente);
 			pstatement.setInt(2, idCorso);
-			pstatement.setDate(3, data);
+			pstatement.setString(3, data);
 			result = pstatement.executeQuery();
 			if(result.next()) {
 				mark = new Mark();
@@ -104,7 +104,7 @@ public class StudentDAO {
 	
 	public boolean registeredForAppeal(int matricolaStudente, Appeal appello) throws SQLException {
 		int idCorso = appello.getIdCorso();
-		Date data = appello.getData();
+		String data = appello.getData();
 		String query = "SELECT voto,statovalutazione FROM iscritto "
 				+ "WHERE matricolastudente = ? AND corso = ? AND appello = ?";
 		ResultSet result = null;
@@ -113,7 +113,7 @@ public class StudentDAO {
 			pstatement = con.prepareStatement(query);
 			pstatement.setInt(1, matricolaStudente);
 			pstatement.setInt(2, idCorso);
-			pstatement.setDate(3, data);
+			pstatement.setString(3, data);
 			result = pstatement.executeQuery();
 			
 			if(result.next()) {
@@ -144,7 +144,7 @@ public class StudentDAO {
 	}
 	public void rejectEvaluation(int matricolaStudente, Appeal appello) throws SQLException {
 		int idCorso = appello.getIdCorso();
-		Date data = appello.getData();
+		String data = appello.getData();
 		String query = "UPDATE iscritto SET statovalutazione = 'RIFIUTATO'"
 				+ "WHERE statovalutazione = 'PUBBLICATO' "
 				+ "AND matricolastudente = ? AND corso = ? AND appello = ?";
@@ -154,7 +154,7 @@ public class StudentDAO {
 			pstatement = con.prepareStatement(query);
 			pstatement.setInt(1, matricolaStudente);
 			pstatement.setInt(2, idCorso);
-			pstatement.setDate(3, data);
+			pstatement.setString(3, data);
 			pstatement.executeUpdate();
 			con.commit();
 		} catch (SQLException e) {
