@@ -16,7 +16,6 @@
 		this.message = _message;
 		this.show = function() {
 			messagecontainer.textContent = this.message;
-			console.log(this.message);
 		}
 	}
 
@@ -40,7 +39,6 @@
 								self.alert.textContent = "No courses are taught by this professor!";
 								return;
 							}
-							console.log(coursesToShow);
 							self.update(coursesToShow); // self visible by closure
 							if (next) next(); // show the default element of the list if present
 
@@ -157,9 +155,11 @@
 	}
 	
 
-	function StudentsDetails(alert, registeredstudentscontainerbody) {
+	function StudentsDetails(alert, registeredstudentscontainerbody, registeredstudentscontainer) {
 		this.alert = alert;
 		this.registeredstudentscontainerbody = registeredstudentscontainerbody;
+		this.registeredstudentscontainer = registeredstudentscontainer;
+		this.registeredStudentsString;
 
 		this.show = function(courseId, appealDate) {
 			var self = this;
@@ -169,23 +169,14 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var obj = JSON.parse(req.responseText);
+							
+							if (obj.length == 0) {
+								self.alert.textContent = "No registered students for this appeal!";
+								return;
+							}
+							
 							// Crea un oggetto JavaScript vuoto per conservare gli oggetti ricostruiti
 							var reconstructedRegisteredStudents = {};
-							/*//console.out("testo json :"+ JSON.stringify(registeredStudents));
-							for (var key in registeredStudents) {
-								if (registeredStudents.hasOwnProperty(key)) {
-									var value = registeredStudents[key];
-									// Fai qualcosa con la chiave e il valore
-									console.log("chiave "+ key.toString());
-									console.log(typeof key);
-									console.log("value "+ value);
-									console.log(typeof value);
-									console.log(value.mark);
-									console.log(value.statoValutazione);
-								}
-							}
-					   */
-							console.log(typeof registeredStudents);
 
 							// Scorrere tutte le chiavi nell'oggetto JSON
 							for (var key in obj) {
@@ -193,17 +184,12 @@
 									var entry = obj[key];
 									var originalKey = JSON.parse(entry.key);
 									var value = JSON.parse(entry.value);
-									console.log("stringifykey: " + JSON.stringify(originalKey));
-									console.log("value: " + JSON.stringify(value));
 									// Ricostruisci l'oggetto originale utilizzando la chiave originale
 									reconstructedRegisteredStudents[JSON.stringify(originalKey)] = value;
 								}
 							}
 
-							// Stampa gli oggetti ricostruiti
-							console.log(reconstructedRegisteredStudents);
-
-							self.update(reconstructedRegisteredStudents); // self is the object on which the function
+							self.update(reconstructedRegisteredStudents, appealDate); // self is the object on which the function
 							// is applied
 							self.registeredstudentscontainer.style.visibility = "visible";
 
@@ -240,8 +226,16 @@
 			);
 		};
 
-		this.update = function(registeredStudentsMap) {
+		this.update = function(registeredStudentsMap, appealDate) {
 			var self = this;
+			
+			while (self.registeredstudentscontainerbody.firstChild) {
+			  self.registeredstudentscontainerbody.removeChild(self.registeredstudentscontainerbody.firstChild);
+			}
+
+			self.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
+					document.getElementById("id_registeredstudentsstring"));
+			self.registeredStudentsString.show();
 
 			var originalStudent;
 			for (var user in registeredStudentsMap) {
@@ -258,59 +252,60 @@
 					var newemail = document.createElement("td");
 					newemail.textContent = originalStudent.mail;
 					var newdegree = document.createElement("td");
-					newdegree.textContent = originalStudent.corsodilaurea;
+					newdegree.textContent = originalStudent.corsoDiLaurea;
 					var newmark = document.createElement("td");
-					newmark.textContent = originalStudent[user].mark;
+					newmark.textContent = registeredStudentsMap[user].mark;
 					var newevaluationstate = document.createElement("td");
-					newevaluationstate.textContent = originalStudent[user].statovalutazione;
+					newevaluationstate.textContent = registeredStudentsMap[user].statoValutazione;
 
 					newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
+					self.registeredstudentscontainerbody.appendChild(newrow);
 
 				}
 			}
 
 		};
+	}
 
-		function PageOrchestrator() {
-			var alertContainer = document.getElementById("id_alert");
+	function PageOrchestrator() {
+		var alertContainer = document.getElementById("id_alert");
 
-			this.start = function() {
-				let personalMessageName = new PersonalMessage(JSON.parse(sessionStorage.getItem('user')).nome,
-					document.getElementById("id_nome"));
-				personalMessageName.show();
+		this.start = function() {
+			let personalMessageName = new PersonalMessage(JSON.parse(sessionStorage.getItem('user')).nome,
+				document.getElementById("id_nome"));
+			personalMessageName.show();
 
-				let personalMessageSurname = new PersonalMessage(JSON.parse(sessionStorage.getItem('user')).cognome,
-					document.getElementById("id_cognome"));
-				personalMessageSurname.show();
+			let personalMessageSurname = new PersonalMessage(JSON.parse(sessionStorage.getItem('user')).cognome,
+				document.getElementById("id_cognome"));
+			personalMessageSurname.show();
 
-				coursesList = new CoursesList(
-					alertContainer,
-					document.getElementById("id_courses"));
+			coursesList = new CoursesList(
+				alertContainer,
+				document.getElementById("id_courses"));
 
-				courseAppeals = new CourseAppeals(alertContainer);
+			courseAppeals = new CourseAppeals(alertContainer);
 
-				studentsDetails = new StudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"));
+			studentsDetails = new StudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"), document.getElementById("id_registeredstudentscontainer"));
 
-				/*	      
-						  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
-				
-						  wizard = new Wizard(document.getElementById("id_createmissionform"), alertContainer);
-						  wizard.registerEvents(this);  // the orchestrator passes itself --this-- so that the wizard can call its refresh function after creating a mission
-				
-						  document.querySelector("a[href='Logout']").addEventListener('click', () => {
-							window.sessionStorage.removeItem('username');
-						  })*/
-			};
+			/*	      
+					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
+			
+					  wizard = new Wizard(document.getElementById("id_createmissionform"), alertContainer);
+					  wizard.registerEvents(this);  // the orchestrator passes itself --this-- so that the wizard can call its refresh function after creating a mission
+			
+					  document.querySelector("a[href='Logout']").addEventListener('click', () => {
+						window.sessionStorage.removeItem('username');
+					  })*/
+		};
 
-			this.refresh = function(currentMission) { // currentMission initially null at start
-				alertContainer.textContent = "";        // not null after creation of status change
-				coursesList.reset();
-				courseAppeals.reset();
-				coursesList.show(function() {
-					//coursesList.autoclick(currentMission); 
-				}); // closure preserves visibility of this
-				//wizard.reset();
-			};
-		}
-    }
+		this.refresh = function(currentMission) { // currentMission initially null at start
+			alertContainer.textContent = "";        // not null after creation of status change
+			coursesList.reset();
+			courseAppeals.reset();
+			coursesList.show(function() {
+				//coursesList.autoclick(currentMission); 
+			}); // closure preserves visibility of this
+			//wizard.reset();
+		};
+	}
 })();

@@ -94,7 +94,6 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 			
 			if(appello != null && corso != null) {
 				idCorso = Integer.parseInt(corso);
-				System.out.println(appello);
 				appealDate = Date.valueOf(appello);
 				
 				appeal.setData(appello);
