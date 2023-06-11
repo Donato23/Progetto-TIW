@@ -85,7 +85,7 @@ public class CreateReport extends HttpServlet {
 			return;
 		}
 		try {
-			appeal.setData(Date.valueOf(dataAppello));
+			appeal.setData(dataAppello);
 			appeal.setIdCorso(Integer.parseInt(corso));
 			
 			//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello
@@ -144,7 +144,7 @@ public class CreateReport extends HttpServlet {
 		}
 		
 		try {
-			appeal.setData(Date.valueOf(dataAppello));
+			appeal.setData(dataAppello);
 			appeal.setIdCorso(Integer.parseInt(corso));
 			
 			//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello

@@ -88,7 +88,7 @@ public class GetEvaluationByAppeal extends HttpServlet {
 			String appello = request.getParameter("dataAppello");
 			if(appello != null && corso != null) {
 				selAppeal.setIdCorso(Integer.parseInt(corso));
-				selAppeal.setData(Date.valueOf(appello));
+				selAppeal.setData(appello);
 			}
 			if (!studentDAO.registeredForAppeal(mStu, selAppeal)) {
 				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeStudentAppeals?idCorso="+corso);

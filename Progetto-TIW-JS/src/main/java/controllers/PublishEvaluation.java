@@ -85,7 +85,7 @@ public class PublishEvaluation extends HttpServlet {
 		}
 		Appeal appeal = new Appeal();
 		try {
-			appeal.setData(Date.valueOf(appealDate));
+			appeal.setData(appealDate);
 			appeal.setIdCorso(Integer.parseInt(courseId));
 		}catch (NumberFormatException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");

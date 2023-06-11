@@ -83,7 +83,7 @@ public class RejectEvaluation extends HttpServlet {
 			String appello = request.getParameter("dataAppello");
 			if(appello != null && corso != null) {
 				selAppeal.setIdCorso(Integer.parseInt(corso));
-				selAppeal.setData(Date.valueOf(appello));
+				selAppeal.setData(appello);
 			}
 //			if (!studentDAO.registredForAppeal(mStu, selAppeal)) {
 //				response.sendRedirect("/WEB-INF/HomeStudentAppeal.html");

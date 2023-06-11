@@ -173,7 +173,8 @@ public class ModifyEvaluation extends HttpServlet {
 				selAppeal.setData(appello);
 				studentId = Integer.parseInt(mStu);
 			}else {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in evaluation publication");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Missing parameters in evaluation publication");
 				return;
 			}
 			
@@ -181,7 +182,8 @@ public class ModifyEvaluation extends HttpServlet {
 					evaluation.equals("RIMANDATO") || evaluation.equals("RIPROVATO") || evaluation.equals("30L"))) {
 				mark = Integer.parseInt(evaluation);
 				if(mark < 18 || mark > 30) {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "PAR ERROR: Parameter is not valid");
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					response.getWriter().println("PAR ERROR: Parameter is not valid");
 					return;
 				}
 			}
@@ -189,30 +191,34 @@ public class ModifyEvaluation extends HttpServlet {
 			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), selAppeal.getIdCorso());
 			
 			if(!appelliDocente.contains(selAppeal)){
-				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?dataAppello=" + selAppeal.getData() + "&idCorso=" + selAppeal.getIdCorso() + "&sortBy=matricola&order=ASC");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No appeals on this date for this course");
 				return;
 			}
 			
 			student = studentDao.findStudentById(studentId);
 			if(student.getRuolo().equals("docente")) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameter must be a student ID");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Parameter must be a student ID");
 				return;
 			}
 			if(!studentDao.registeredForAppeal(studentId, selAppeal)) {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "StudentId must be of a registered student");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("StudentId must be of a registered student");
 				return;
 			}
 			
 			professorDao.insertEvaluation(studentId, evaluation, selAppeal);
 		} catch (IllegalArgumentException e) {
-			response.getWriter().append("PAR ERROR: Parameter is not valid");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: Parameter is not valid");
 		} catch (SQLException e) {
 			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in project database extraction");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure in database extraction");
 		}
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/GetRegisteredStudentsByAppeal?dataAppello=" + selAppeal.getData() + "&idCorso=" + selAppeal.getIdCorso() + "&sortBy=matricola&order=ASC";
-		response.sendRedirect(path);
+		
+		response.setStatus(HttpServletResponse.SC_OK);
 	}
 
 	public void destroy() {

@@ -1,6 +1,7 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
 	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails;
+	let publishButton;
 
 	window.addEventListener("load", () => {
 		if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -28,6 +29,7 @@
 
 		this.reset = function() {
 			this.listcontainer.style.visibility = "hidden";
+			publishButton.style.visibility = "hidden";
 		}
 
 		this.show = function(next) {
@@ -111,7 +113,12 @@
 								return;
 							}
 							
+							if(registeredStudentsDetails.registeredStudentsString != undefined){
+								registeredStudentsDetails.registeredStudentsString.refresh();
+							}
+							registeredStudentsDetails.registeredstudentscontainer.style.visibility = "hidden";
 							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
+							publishButton.style.visibility = "hidden";
 							
 							self.alert.textContent = "";
 							self.update(appealsToShow); // self visible by closure
@@ -198,6 +205,7 @@
 							if (objLength == 0) {
 								if(self.registeredStudentsString != undefined){
 									self.registeredstudentscontainer.style.visibility = "hidden";
+									publishButton.style.visibility = "hidden";
 									self.registeredStudentsString.refresh();
 								}
 								self.alert.textContent = "No registered students for this appeal!";
@@ -207,6 +215,7 @@
 							self.alert.textContent = "";
 							self.update(reconstructedRegisteredStudents, appealDate, courseId);
 							self.registeredstudentscontainer.style.visibility = "visible";
+							publishButton.style.visibility = "visible";
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
 							window.sessionStorage.removeItem('user');
@@ -226,7 +235,10 @@
 			while (this.registeredstudentscontainerbody.firstChild) {
 			  this.registeredstudentscontainerbody.removeChild(this.registeredstudentscontainerbody.firstChild);
 			}
-
+			
+			publishButton.querySelector("input[type = 'hidden'][name = 'appealDate']").value = appealDate;
+			publishButton.querySelector("input[type = 'hidden'][name = 'courseId']").value = courseId;
+			
 			this.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
 					document.getElementById("id_registeredstudentsstring"));
 			this.registeredStudentsString.show();
@@ -258,7 +270,7 @@
 					if(registeredStudentsMap[user].statoValutazione === "INSERITO" || registeredStudentsMap[user].statoValutazione === "NON_INSERITO"){
 						var newButton = document.createElement("td");
 						var newForm = document.createElement("form");
-						newForm.setAttribute("id", "id_modifybutton")
+						//newForm.setAttribute("id", "id_modifybutton")
 						newForm.setAttribute("action", "#");
 						var newInputAppealDate = document.createElement("input");
 						newInputAppealDate.setAttribute("type", "hidden");
@@ -278,6 +290,8 @@
 						newInputModify.setAttribute("value", "Modify");
 						
 						newInputModify.addEventListener("click",  function(e) { // called when one clicks the button
+							publishButton.style.visibility = "hidden";
+							
 					        let form = e.target.closest("form"); // example of DOM navigation from event object
 					        if (form.checkValidity()) {
 					          let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
@@ -291,7 +305,7 @@
 					              if (req.readyState === 4) { // response has arrived
 					                let message = req.responseText; // get the body of the response
 					                if (req.status === 200) { // if no errors
-					                  singleStudentDetails.update(JSON.parse(message));
+					                  singleStudentDetails.update(JSON.parse(message), appealDate, courseId, studentId);
 					                } else {
 					                  self.alert.textContent = message; // report the error contained in the response body
 					                }
@@ -320,7 +334,7 @@
 		this.alert = alert;
 		this.studentDetailsContainer = studentDetailsContainer;
 		
-		this.update = function(studentDetails){
+		this.update = function(studentDetails, appealDate, courseId, studentId){
 			// setting visibility
 			this.studentDetailsContainer.style.visibility = "visible";
 			
@@ -333,7 +347,27 @@
 			
 			// adding event listener for evaluation submit
 			document.getElementById("id_modifyevaluationbutton").addEventListener("click", function(e){
-				console.log("ciaoo");
+				let form = e.target.closest("form"); // example of DOM navigation from event object
+			    if (form.checkValidity()){
+			      let newEvaluation = form.querySelector("select[name = 'evaluation']").value;
+			      
+			      e.preventDefault();
+			      
+			      makeCall("POST", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + studentId + "&evaluation=" + newEvaluation, form,
+			        function(req) { // callback of the POST HTTP request
+			          if (req.readyState === 4) { // response has arrived
+			            let message = req.responseText; // get the body of the response
+			            if (req.status === 200) { // if no errors
+			              registeredStudentsDetails.show(courseId, appealDate); // goes back to showing the table of registered students
+			            } else {
+			              alertContainer.textContent = message; // report the error contained in the response body
+			            }
+			          }
+			        }
+			      );
+			    } else {
+			      form.reportValidity(); // trigger the client-side HTML error messaging
+			    }
 			});
 		};
 		
@@ -361,6 +395,32 @@
 			registeredStudentsDetails = new RegisteredStudentsDetails(alertContainer, document.getElementById("id_registeredstudentscontainerbody"), document.getElementById("id_registeredstudentscontainer"));
 
 			singleStudentDetails = new SingleStudentDetails(alertContainer, document.getElementById("id_studentdetailscontainer"));
+			
+			publishButton = document.getElementById("id_publishbutton");
+			publishButton.addEventListener("click", function(e){
+				let form = e.target.closest("form");
+			    if (form.checkValidity()){
+			      let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
+				  let courseId = form.querySelector("input[type = 'hidden'][name = 'courseId']").value;
+			      
+			      e.preventDefault();
+			      
+			      makeCall("POST", "PublishEvaluation?appealDate=" + appealDate + "&courseId=" + courseId, form,
+			        function(req) { 
+			          if (req.readyState === 4) {
+			            let message = req.responseText; 
+			            if (req.status === 200) { 
+			              registeredStudentsDetails.show(courseId, appealDate);
+			            } else {
+			              alertContainer.textContent = message;
+			            }
+			          }
+			        }
+			      );
+			    } else {
+			      form.reportValidity(); // trigger the client-side HTML error messaging
+			    }
+			}, false);
 			
 			/*	      
 					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
