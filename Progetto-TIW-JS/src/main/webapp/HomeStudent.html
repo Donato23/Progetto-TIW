@@ -2,9 +2,57 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Student's home</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<script src="homeStudent.js" charset="utf-8" defer></script>
+<script src="utils.js" charset="utf-8" defer></script>
 </head>
 <body>
-
+<h1>Welcome to the Student's Home Page</h1>
+	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
+	<div id="id_alert" class="alertmessage"></div>	
+	<table>
+		<tr>
+			<td>
+				<p>These are your courses:</p>
+				<ul id="id_courses">
+<!-- 					<li id="id_corso0"><a>analisi</a>
+						<ul>
+							<li><a>20/8/2023</a></li>
+						</ul>
+					</li> -->
+				</ul>				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p><span id="id_appealresult"></span></p>
+				<table id="id_evaluationcontainer" class="boxed" style="visibility: hidden;">
+					<thead>
+						<tr> <th>USER_ID</th><th>NAME</th><th>SURNAME</th><th>COURSE</th><th>APPEAL</th><th>MARK</th><th>STATE</th></tr>
+					</thead>
+					<tbody id="id_evaluationbody">
+						<!-- <tr>
+							<td id="id_idnumber"></td>
+							<td id="id_name"></td>
+							<td id="id_surname"></td>
+							<td id="id_email"></td>
+							<td id="id_degree"></td>
+							<td id="id_mark"></td>
+							<td id="id_evaluationstate"></td>
+							<td>
+								<form id="id_modifybutton" action="#">
+									<input type="hidden" name="appealDate">
+									<input type="hidden" name="courseId">
+									<input type="hidden" name="studentId">
+									<input type="button" name="Modify" value="modify">
+							 	</form>	
+							</td>
+						</tr> -->
+					</tbody> 
+				</table>
+			</td>
+		</tr>
+	</table>
 </body>
 </html>

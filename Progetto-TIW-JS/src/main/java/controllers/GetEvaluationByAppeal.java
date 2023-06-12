@@ -5,15 +5,20 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import dao.CourseDAO;
 import dao.StudentDAO;
@@ -26,6 +31,7 @@ import javaBeans.User;
  * Servlet implementation class GetEvaluationByAppeal
  */
 @WebServlet("/GetEvaluationByAppeal")
+@MultipartConfig
 public class GetEvaluationByAppeal extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -98,15 +104,38 @@ public class GetEvaluationByAppeal extends HttpServlet {
 			selCourse = courseDAO.findCoursesByID(Integer.parseInt(corso));
 			
 		} catch (IllegalArgumentException e) {
-			response.getWriter().append("PAR ERROR: parameter is not valid");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: parameter is not valid");
 			return;
 		} catch (SQLException e) {
 			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in project database extraction");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Failure in database extraction");
 			return;
 		}
-		ServletContext servletContext = getServletContext();
-		String path = "/WEB-INF/Evaluation.html";
+		// String json = new Gson().toJson(registeredStudentsEvaluations);
+		Gson gson = new Gson();
+		JsonObject evaluationData = new JsonObject();
+		evaluationData.addProperty("userId", gson.toJson(u.getMatricola()));
+		evaluationData.addProperty("nomeStudente", gson.toJson(u.getNome()));
+		evaluationData.addProperty("cognomeStudente", gson.toJson(u.getCognome()));
+		evaluationData.addProperty("idCorso", gson.toJson(selCourse.getId()));
+		evaluationData.addProperty("nomeCorso", gson.toJson(selCourse.getNome()));
+		evaluationData.addProperty("dataAppello", gson.toJson(selAppeal.getData()));
+		String parsedMark = null;
+		String parsedStatoValutazione = null;
+		if(mark != null) {
+			parsedMark = gson.toJson(mark.getMark());
+			parsedStatoValutazione = gson.toJson(mark.getStatoValutazione());
+		}
+		evaluationData.addProperty("mark", parsedMark);
+		evaluationData.addProperty("statoValutazione", parsedStatoValutazione);
+
+		String json = gson.toJson(evaluationData);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	/**
@@ -117,6 +146,15 @@ public class GetEvaluationByAppeal extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
+	}
+
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
 	}
 
 }

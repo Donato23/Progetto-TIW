@@ -9,11 +9,14 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
 
 import dao.CourseDAO;
 import javaBeans.Course;
@@ -24,6 +27,7 @@ import javaBeans.User;
  * Servlet implementation class GoToHomeStudent
  */
 @WebServlet("/GoToHomeStudent")
+@MultipartConfig
 public class GoToHomeStudent extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -37,7 +41,6 @@ public class GoToHomeStudent extends HttpServlet {
     }
     
     public void init() throws ServletException {
-    	ServletContext servletContext = getServletContext();
 		
 		try {
 			ServletContext context = getServletContext();
@@ -78,11 +81,14 @@ public class GoToHomeStudent extends HttpServlet {
 			corsi = courseDAO.findCoursesByStudent(u.getMatricola());
 			
 		} catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in student's courses database extraction");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Database access failed");
 		}
-		String path = "/WEB-INF/HomeStudentCourses.html";
-		ServletContext servletContext = getServletContext();
+		String json = new Gson().toJson(corsi);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	/**
