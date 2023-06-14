@@ -10,11 +10,16 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import dao.AppealDAO;
 import dao.ReportDAO;
@@ -26,6 +31,7 @@ import javaBeans.User;
  * Servlet implementation class CreateReport
  */
 @WebServlet("/CreateReport")
+@MultipartConfig
 public class CreateReport extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -81,7 +87,8 @@ public class CreateReport extends HttpServlet {
 		List<Report> verbaliAppello = null;
 		
 		if(corso == null || dataAppello == null || report == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in creating report");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Missing parameters");
 			return;
 		}
 		try {
@@ -93,24 +100,45 @@ public class CreateReport extends HttpServlet {
 			verbaliAppello = reportDAO.findReportByAppeal(appeal);
 			
 			newReport = reportDAO.findReportById(Integer.parseInt(report));
-			if(newReport == null) {
-				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
-				return;
-			}
+//			if(newReport == null) {
+//				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
+//				return;
+//			}
 			if(!appelliDocente.contains(appeal) || !verbaliAppello.contains(newReport) ){
-				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessor");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No appeals on this date for this course");
 				return;
 			}
 		}catch (IllegalArgumentException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Bad parameter - Parameter was not of required type");
 			return;
 		}catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database extraction and of reportData");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure in database extraction and of reportData");
 			return;
 		}
 		
-		String path = "/WEB-INF/Report.html";
-		ServletContext servletContext = getServletContext();
+		JsonObject reportData = new JsonObject();
+		JsonArray studentsData = new JsonArray();
+		reportData.addProperty("id", newReport.getId());
+		reportData.addProperty("data", newReport.getData());
+		reportData.addProperty("ora", newReport.getOra());
+		for(User key : newReport.getStudentData().keySet()) {
+			JsonObject studentData = new JsonObject();
+			studentData.addProperty("studentId", key.getMatricola());
+			studentData.addProperty("studentName", key.getNome());
+			studentData.addProperty("studentSurname", key.getCognome());
+			studentData.addProperty("studentMark", newReport.getStudentData().get(key));
+			studentsData.add(studentData);
+		}
+		reportData.add("studentsData", studentsData);
+		
+		String json = new Gson().toJson(reportData);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	/**
@@ -139,7 +167,8 @@ public class CreateReport extends HttpServlet {
 		List<Appeal> appelliDocente = null;
 		
 		if(corso == null || dataAppello == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in creating report");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Missing parameters in report creation");
 			return;
 		}
 		
@@ -150,26 +179,32 @@ public class CreateReport extends HttpServlet {
 			//controllo che l'appello sia tenuto dal professore e che sia un verbale associato a quell'appello
 			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), Integer.parseInt(corso));
 			if(!appelliDocente.contains(appeal)){
-				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeProfessor");
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No appeals on this date for this course");
 				return;
 			}
 			
 			newReport = reportDAO.createReport(appeal);
 			
-			if(newReport == null) {
-				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
-				return;
-			}
+//			if(newReport == null) {
+//				//response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
+//				return;
+//			}
 		}catch (IllegalArgumentException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: Parameter is not valid");
 			return;
 		}catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database extraction and creatinig report");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure in database extraction");
 			return;
 		}
-		response.sendRedirect(getServletContext().getContextPath() + "/CreateReport?idReport="+newReport.getId() +"&idCorso="+corso+"&dataAppello="+dataAppello);
-		return;
 		
+		String json = new Gson().toJson(newReport.getId());
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 	}
 
 	public void destroy() {

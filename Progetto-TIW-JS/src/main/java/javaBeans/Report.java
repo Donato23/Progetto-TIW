@@ -6,8 +6,8 @@ import java.sql.Date;
 
 public class Report {
 	private int id;
-	private Date data;
-	private LocalTime ora;
+	private String data;
+	private String ora;
 	private Map<User,String> studentData;
 	
 	public Map<User, String> getStudentData() {
@@ -22,16 +22,16 @@ public class Report {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public Date getData() {
+	public String getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(String data) {
 		this.data = data;
 	}
-	public LocalTime getOra() {
+	public String getOra() {
 		return ora;
 	}
-	public void setOra(LocalTime ora) {
+	public void setOra(String ora) {
 		this.ora = ora;
 	}
 	@Override

@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import javaBeans.User;
  * Servlet implementation class PublishEvaluation
  */
 @WebServlet("/PublishEvaluation")
+@MultipartConfig
 public class PublishEvaluation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -80,7 +82,8 @@ public class PublishEvaluation extends HttpServlet {
 		String appealDate = request.getParameter("appealDate");
 		String courseId = request.getParameter("courseId");
 		if(appealDate == null || courseId == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters in evaluation publication");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Missing parameters in evaluation publication");
 			return;
 		}
 		Appeal appeal = new Appeal();
@@ -88,7 +91,8 @@ public class PublishEvaluation extends HttpServlet {
 			appeal.setData(appealDate);
 			appeal.setIdCorso(Integer.parseInt(courseId));
 		}catch (NumberFormatException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Bad parameter - Parameter was not of required type");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Bad parameter - Parameter was not of required type");
 			return;
 		}
 		
@@ -96,13 +100,12 @@ public class PublishEvaluation extends HttpServlet {
 		try {
 			professorDao.publishEvaluation(appeal);
 		}catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in publishing evaluation in database");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure in database extraction");
 			return;
 		}
 		
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/GetRegisteredStudentsByAppeal?dataAppello=" + appeal.getData() + "&idCorso=" + appeal.getIdCorso()+"&sortBy=matricola&order=ASC";
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
 	}
 
 	public void destroy() {

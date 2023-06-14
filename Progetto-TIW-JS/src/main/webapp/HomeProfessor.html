@@ -8,6 +8,9 @@
 <script src="utils.js" charset="utf-8" defer></script>
 </head>
 <body>
+<div align="right">
+	<a href="Logout">Logout</a>
+</div>
 <h1>Welcome to the Professor's Home Page</h1>
 	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
 	<div id="id_alert" class="alertmessage"></div>	
@@ -62,6 +65,15 @@
 				</form>
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<form id="id_createreportbutton" action="#">
+					<input type="hidden" name="dataAppello"></input>
+					<input type="hidden" name="idCorso"></input>
+					<input type="button" name="createreport" value="Create report"></input>
+				</form>
+			</td>
+		</tr>
 		<tr id="id_studentdetailscontainer" style="visibility: hidden;">
 			<td>
 				<h2>Student details:</h2>
@@ -94,6 +106,26 @@
 						</select> <br> 
 						<input id="id_modifyevaluationbutton" type="button" name="submit" value="Submit changes">
 					</form>
+			</td>
+		</tr>
+		<tr id="id_reportdetailscontainer">
+			<td>
+				<h2>New report created:</h2>
+				<h3>Report N. <span id="id_reportnumber"></span></h3>
+				<h4>Date: <span id="id_reportdate"></span> H: <span id="id_reporttime"></span></h4>
+				<h4>CourseID: <span id="id_reportcourseid"></span> Appeal of <span id="id_reportappealdate"></span></h4>
+				<table>
+					<thead>
+						<tr>
+							<th>STUDENT ID</th>
+							<th>NAME</th>
+							<th>SURNAME</th>
+							<th>MARK</th>
+						</tr>
+					</thead>
+					<tbody id="id_reportstudentdetailscontainerbody">
+					</tbody>
+				</table>
 			</td>
 		</tr>
 	</table>

@@ -1,7 +1,7 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
-	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails;
-	let publishButton;
+	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails, reportDetails;
+	let publishButton, reportButton;
 
 	window.addEventListener("load", () => {
 		if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -30,6 +30,8 @@
 		this.reset = function() {
 			this.listcontainer.style.visibility = "hidden";
 			publishButton.style.visibility = "hidden";
+			reportButton.style.visibility = "hidden";
+			reportDetails.reportContainer.style.visibility = "hidden";
 		}
 
 		this.show = function(next) {
@@ -119,6 +121,8 @@
 							registeredStudentsDetails.registeredstudentscontainer.style.visibility = "hidden";
 							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
 							publishButton.style.visibility = "hidden";
+							reportButton.style.visibility = "hidden";
+							reportDetails.reportContainer.style.visibility = "hidden";
 							
 							self.alert.textContent = "";
 							self.update(appealsToShow); // self visible by closure
@@ -206,6 +210,8 @@
 								if(self.registeredStudentsString != undefined){
 									self.registeredstudentscontainer.style.visibility = "hidden";
 									publishButton.style.visibility = "hidden";
+									reportButton.style.visibility = "hidden";
+									reportDetails.reportContainer.style.visibility = "hidden";
 									self.registeredStudentsString.refresh();
 								}
 								self.alert.textContent = "No registered students for this appeal!";
@@ -213,9 +219,13 @@
 							}
 
 							self.alert.textContent = "";
-							self.update(reconstructedRegisteredStudents, appealDate, courseId);
 							self.registeredstudentscontainer.style.visibility = "visible";
 							publishButton.style.visibility = "visible";
+							reportButton.style.visibility = "visible";
+							reportDetails.reportContainer.style.visibility = "hidden";
+							
+							
+							self.update(reconstructedRegisteredStudents, appealDate, courseId);
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
 							window.sessionStorage.removeItem('user');
@@ -238,6 +248,8 @@
 			
 			publishButton.querySelector("input[type = 'hidden'][name = 'appealDate']").value = appealDate;
 			publishButton.querySelector("input[type = 'hidden'][name = 'courseId']").value = courseId;
+			reportButton.querySelector("input[type = 'hidden'][name = 'dataAppello']").value = appealDate;
+			reportButton.querySelector("input[type = 'hidden'][name = 'idCorso']").value = courseId;
 			
 			this.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
 					document.getElementById("id_registeredstudentsstring"));
@@ -291,6 +303,7 @@
 						
 						newInputModify.addEventListener("click",  function(e) { // called when one clicks the button
 							publishButton.style.visibility = "hidden";
+							reportButton.style.visibility = "hidden";
 							
 					        let form = e.target.closest("form"); // example of DOM navigation from event object
 					        if (form.checkValidity()) {
@@ -373,6 +386,67 @@
 		
 		this.register = function(){};
 	}
+	
+	function ReportDetails(alert, reportContainer, reportContainerBody){
+		this.alert = alert;
+		this.reportContainer = reportContainer;
+		this.reportContainerBody = reportContainerBody;
+		
+		this.show = function(reportId, courseId, appealDate){
+			var self = this;
+			makeCall("GET", "CreateReport?idReport=" + reportId + "&idCorso=" + courseId + "&dataAppello=" + appealDate, null,
+				function(req) {
+					if (req.readyState == 4) {
+							var message = req.responseText;
+							if (req.status == 200) {
+								if(JSON.parse(message) !== null){
+									reportDetails.update(JSON.parse(message), courseId, appealDate);
+								}
+							}
+						} else if (req.status == 403) {
+							window.location.href = req.getResponseHeader("Location");
+							window.sessionStorage.removeItem('user');
+						}
+						else {
+							self.alert.textContent = message;
+
+						}
+					}
+			);
+		}
+		
+		this.update = function(report, courseId, appealDate){	
+			var self = this;
+			
+			document.getElementById("id_reportnumber").textContent = report.id;
+			document.getElementById("id_reportdate").textContent = report.data;
+			document.getElementById("id_reporttime").textContent = report.ora;
+			document.getElementById("id_reportcourseid").textContent = courseId;
+			document.getElementById("id_reportappealdate").textContent = appealDate;
+			
+			report.studentsData.forEach(function(sData){
+				/*console.log(sData.studentId);
+				console.log(sData.studentName);
+				console.log(sData.studentSurname);
+				console.log(sData.studentMark);*/
+				
+				var newRow = document.createElement("tr");
+				var newStudentId = document.createElement("td");
+				newStudentId.textContent = sData.studentId;
+				var newStudentName = document.createElement("td");
+				newStudentName.textContent = sData.studentName;
+				var newStudentSurname = document.createElement("td");
+				newStudentSurname.textContent = sData.studentSurname;
+				var newStudentMark = document.createElement("td");
+				newStudentMark.textContent = sData.studentMark;
+				
+				newRow.append(newStudentId, newStudentName, newStudentSurname, newStudentMark);
+				self.reportContainerBody.appendChild(newRow);
+			});
+			
+			this.reportContainer.style.visibility = "visible";
+		}
+	}
 
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
@@ -413,6 +487,37 @@
 			              registeredStudentsDetails.show(courseId, appealDate);
 			            } else {
 			              alertContainer.textContent = message;
+			            }
+			          }
+			        }
+			      );
+			    } else {
+			      form.reportValidity(); // trigger the client-side HTML error messaging
+			    }
+			}, false);
+			
+			reportDetails = new ReportDetails(alertContainer, document.getElementById("id_reportdetailscontainer"), document.getElementById("id_reportstudentdetailscontainerbody"));
+			
+			reportButton = document.getElementById("id_createreportbutton");
+			reportButton.addEventListener("click", function(e){
+				let form = e.target.closest("form");
+			    if (form.checkValidity()){
+			      let appealDate = form.querySelector("input[type = 'hidden'][name = 'dataAppello']").value;
+				  let courseId = form.querySelector("input[type = 'hidden'][name = 'idCorso']").value;
+			      
+			      e.preventDefault();
+			      
+			      makeCall("POST", "CreateReport?dataAppello=" + appealDate + "&idCorso=" + courseId, form,
+			        function(req) { 
+			          if (req.readyState === 4) {
+			            let message = req.responseText; 
+			            if (req.status === 200) { 
+							if(JSON.parse(message) !== null){
+								registeredStudentsDetails.show(courseId, appealDate);
+								reportDetails.show(JSON.parse(message), courseId, appealDate);
+							}
+			            } else {
+			              	alertContainer.textContent = message;
 			            }
 			          }
 			        }

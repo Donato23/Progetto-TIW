@@ -28,13 +28,13 @@ public class ReportDAO {
 		String dataAppello = appello.getData();
 		
 		int codiceVerbale;
-		Date dataVerbale = Date.valueOf(LocalDate.now());
+		String dataVerbale = LocalDate.now().toString();
 		LocalTime ora = LocalTime.now();
 		Map<User,String> datiVerbale = null;
 		
 		Report newReport = new Report();
 		newReport.setData(dataVerbale);
-		newReport.setOra(ora);
+		newReport.setOra(ora.toString());
 		
 		String query0 = "SELECT MAX(codice) AS ultimocodice FROM verbale";
 		String query1 = "INSERT into verbale (codice, data, ora) VALUES(?, ?, ?)";
@@ -65,7 +65,7 @@ public class ReportDAO {
 			// creo il nuovo report
 			pstatement1 = con.prepareStatement(query1);
 			pstatement1.setInt(1, codiceVerbale);
-			pstatement1.setDate(2, dataVerbale);
+			pstatement1.setDate(2, Date.valueOf(dataVerbale));
 			pstatement1.setTime(3, Time.valueOf(ora));
 			pstatement1.executeUpdate();
 			
@@ -140,8 +140,8 @@ public class ReportDAO {
 			while(result.next()) {
 				report = new Report();
 				report.setId(result.getInt("codice"));
-				report.setData(result.getDate("data"));
-				report.setOra(result.getTime("ora").toLocalTime());
+				report.setData(result.getDate("data").toString());
+				report.setOra(result.getTime("ora").toLocalTime().toString());
 				datiVerbale = findReportData(result.getInt("codice"));
 				report.setStudentData(datiVerbale);
 				reports.add(report);
@@ -181,8 +181,8 @@ public class ReportDAO {
 				return null;
 			
 			report.setId(result.getInt("codice"));
-			report.setData(result.getDate("data"));
-			report.setOra(result.getTime("ora").toLocalTime());
+			report.setData(result.getDate("data").toString());
+			report.setOra(result.getTime("ora").toLocalTime().toString());
 			
 			studentData = findReportData(codiceVerbale);
 			if(studentData == null)
