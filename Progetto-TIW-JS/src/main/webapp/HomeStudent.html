@@ -10,26 +10,37 @@
 <body>
 <h1>Welcome to the Student's Home Page</h1>
 	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
-	<div id="id_alert" class="alertmessage"></div>	
+	<div id="id_alert" class="alertmessage"></div>
 	<table>
 		<tr>
 			<td>
 				<p>These are your courses:</p>
 				<ul id="id_courses">
-<!-- 					<li id="id_corso0"><a>analisi</a>
+					<!-- 					<li id="id_corso0"><a>analisi</a>
 						<ul>
 							<li><a>20/8/2023</a></li>
 						</ul>
 					</li> -->
-				</ul>				
+				</ul>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<p><span id="id_appealresult"></span></p>
-				<table id="id_evaluationcontainer" class="boxed" style="visibility: hidden;">
+				<p>
+					<span id="id_appealresult"></span>
+				</p>
+				<table id="id_evaluationcontainer" class="boxed"
+					style="visibility: hidden;">
 					<thead>
-						<tr> <th>USER_ID</th><th>NAME</th><th>SURNAME</th><th>COURSE</th><th>APPEAL</th><th>MARK</th><th>STATE</th></tr>
+						<tr>
+							<th>USER_ID</th>
+							<th>NAME</th>
+							<th>SURNAME</th>
+							<th>COURSE</th>
+							<th>APPEAL</th>
+							<th>MARK</th>
+							<th>STATE</th>
+						</tr>
 					</thead>
 					<tbody id="id_evaluationbody">
 						<!-- <tr>
@@ -49,8 +60,17 @@
 							 	</form>	
 							</td>
 						</tr> -->
-					</tbody> 
+					</tbody>
 				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<form id="id_rejectbutton" action="#">
+					<input type="hidden" name="appealDate"></input> 
+					<input type="hidden" name="courseId"></input> 
+					<input type="button" name="reject" value="Reject"></input>
+				</form>
 			</td>
 		</tr>
 	</table>

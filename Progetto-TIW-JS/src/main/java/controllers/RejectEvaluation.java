@@ -9,11 +9,15 @@ import java.sql.SQLException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import dao.CourseDAO;
 import dao.StudentDAO;
@@ -26,6 +30,7 @@ import javaBeans.User;
  * Servlet implementation class RejectEvaluation
  */
 @WebServlet("/RejectEvaluation")
+@MultipartConfig
 public class RejectEvaluation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
@@ -72,10 +77,11 @@ public class RejectEvaluation extends HttpServlet {
 				return;
 			}
 		}
+		
 		StudentDAO studentDAO = new StudentDAO(connection);
 		CourseDAO courseDAO = new CourseDAO(connection);
-		Mark mark = null;
-		Course selCourse = null;
+//		Mark mark = null;
+//		Course selCourse = null;
 		Appeal selAppeal = new Appeal();
 		try {
 			int mStu = u.getMatricola();
@@ -85,22 +91,29 @@ public class RejectEvaluation extends HttpServlet {
 				selAppeal.setIdCorso(Integer.parseInt(corso));
 				selAppeal.setData(appello);
 			}
-//			if (!studentDAO.registredForAppeal(mStu, selAppeal)) {
-//				response.sendRedirect("/WEB-INF/HomeStudentAppeal.html");
-//				return;
-//			}
-			selCourse = courseDAO.findCoursesByID(Integer.parseInt(corso));
+
+		
+			if (!studentDAO.registeredForAppeal(mStu, selAppeal)) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("student not registred for this appeal");
+				return;
+			}
+			//selCourse = courseDAO.findCoursesByID(Integer.parseInt(corso));
 			studentDAO.rejectEvaluation(mStu, selAppeal);
-			mark = studentDAO.findEvaluationByAppeal(mStu,selAppeal);
+			//mark = studentDAO.findEvaluationByAppeal(mStu,selAppeal);
 
-		} catch (NumberFormatException e) {
-			response.getWriter().append("PAR ERROR");
+		} catch (IllegalArgumentException e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("PAR ERROR: parameter is not valid");
+			return;
 		} catch (SQLException e) {
-			// throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in project database extraction");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Failure in database extraction");
+			return;
 		}
-		String path = "/WEB-INF/Evaluation.html";
-
+//		String ctxpath = getServletContext().getContextPath();
+//		String path = ctxpath + "/GetEvaluationByAppeal?dataAppello=" + selAppeal.getData() + "&idCorso=" + selAppeal.getIdCorso();
+//		response.sendRedirect(path);
 	}
 
 	/**
@@ -111,4 +124,12 @@ public class RejectEvaluation extends HttpServlet {
 		doGet(request, response);
 	}
 
+	public void destroy() {
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException sqle) {
+		}
+	}
 }

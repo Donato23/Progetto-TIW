@@ -1,6 +1,7 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
 	let coursesList, courseAppeals, evaluationDetails;
+	let rejectButton;
 
 	window.addEventListener("load", () => {
 		if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -28,6 +29,7 @@
 
 		this.reset = function() {
 			this.listcontainer.style.visibility = "hidden";
+			rejectButton.style.visibility = "hidden";
 		}
 
 		this.show = function(next) {
@@ -114,6 +116,7 @@
 								evaluationDetails.appealResult.refresh();
 							}
 							evaluationDetails.evaluationContainer.style.visibility = "hidden";
+							rejectButton.style.visibility = "hidden";
 							
 							self.alert.textContent = "";
 							self.update(appealsToShow); // self visible by closure
@@ -188,7 +191,7 @@
 									var value = JSON.parse(entry);
 									evaluationData[key] = value;
 								}
-								//console.log(key +" " + value)
+								//console.log(key +" " + value);
 							}
 							//self.evaluationContainer.style.visibility = "hidden";
 														
@@ -220,24 +223,32 @@
 		
 		
 		this.update = function(evaluationData){
+			//console.log(evaluationData);
 			var self = this;
-			if(this.appealResult!= undefined){
+			if(this.appealResult != undefined){
 				this.appealResult.refresh();
 			}
 			if(evaluationData.mark == undefined){
 				this.evaluationContainer.style.visibility = "hidden";
+				rejectButton.style.visibility = "hidden";
 				this.appealResult = new PersonalMessage("Evaluation for the "+evaluationData.dataAppello+" appeal not yet defined",
 					document.getElementById("id_appealresult"));
 				this.appealResult.show();
 				
-			} else {
+			}else {
 			
 				while (this.evaluationBody.firstChild) {
 					this.evaluationBody.removeChild(this.evaluationBody.firstChild);
 				}
+				
+				rejectButton.querySelector("input[type = 'hidden'][name = 'appealDate']").value = evaluationData.dataAppello;
+			    rejectButton.querySelector("input[type = 'hidden'][name = 'courseId']").value = evaluationData.idCorso;
+			    
 				this.appealResult = new PersonalMessage("These is your result for the " + evaluationData.dataAppello + " appeal:",
 					document.getElementById("id_appealresult"));
 				this.appealResult.show();
+				
+				rejectButton.style.visibility = "hidden";
 				
 				var newrow = document.createElement("tr");
 				this.evaluationBody.appendChild(newrow);
@@ -258,13 +269,16 @@
 				newrow.append(newidnumber, newname, newsurname, newcourse, newappeal, newmark, newevaluationstate);
 				
 				this.evaluationContainer.style.visibility = "visible";
+				
+				var parsedMark = parseInt(evaluationData.mark);
+				//il caso 30L viene comunque coperto perchè parseInt parsa solo il numero all'inizio della stringa 
+				if(parsedMark >= 18 && parsedMark <= 30 && evaluationData.statoValutazione === "PUBBLICATO"){
+					rejectButton.style.visibility = "visible" 
+					//console.log("voto compreso");		
+				}
 			}
 
-
-
 		}
-
-
 	}
 
 	function PageOrchestrator() {
@@ -285,7 +299,32 @@
 
 			courseAppeals = new CourseAppeals(alertContainer);
 			
-			evaluationDetails = new EvaluationDetails(alertContainer,document.getElementById("id_evaluationcontainer"),document.getElementById("id_evaluationbody"),document.getElementById("id_appealresult"));
+			evaluationDetails = new EvaluationDetails(alertContainer,document.getElementById("id_evaluationcontainer"),document.getElementById("id_evaluationbody"));
+			
+			rejectButton = document.getElementById("id_rejectbutton");
+			rejectButton.addEventListener("click", function(e){
+				let form = e.target.closest("form");
+			    if (form.checkValidity()){
+			      let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
+				  let courseId = form.querySelector("input[type = 'hidden'][name = 'courseId']").value;
+			      e.preventDefault();
+			      
+			      makeCall("GET", "RejectEvaluation?dataAppello=" + appealDate + "&idCorso=" + courseId, form,
+			        function(req) { 
+			          if (req.readyState === 4) {
+			            let message = req.responseText; 
+			            if (req.status === 200) { 
+			              evaluationDetails.show(courseId, appealDate);
+			            } else {
+			              alertContainer.textContent = message;
+			            }
+			          }
+			        }
+			      );
+			    } else {
+			      form.reportValidity(); // trigger the client-side HTML error messaging
+			    }
+			}, false);
 			
 			/*	      
 					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
