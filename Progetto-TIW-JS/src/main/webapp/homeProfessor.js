@@ -178,6 +178,7 @@
 		this.registeredstudentscontainerbody = registeredstudentscontainerbody;
 		this.registeredstudentscontainer = registeredstudentscontainer;
 		this.registeredStudentsString;
+		this.currentOrder = 'asc'; // Ordine corrente (inizialmente ascendente)
 
 		this.show = function(courseId, appealDate) {
 			var self = this;
@@ -278,6 +279,9 @@
 
 					newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
 					
+					
+					
+					
 					// Se è possibile modificare il voto dello studente, aggiungo il pulsane modifica
 					if(registeredStudentsMap[user].statoValutazione === "INSERITO" || registeredStudentsMap[user].statoValutazione === "NON_INSERITO"){
 						var newButton = document.createElement("td");
@@ -329,18 +333,155 @@
 					          form.reportValidity(); // trigger the client-side HTML error messaging
 					        }
 						}, false);
-						
+
 						newForm.append(newInputAppealDate, newInputCourseId, newInputStudentId, newInputModify);
 						newButton.appendChild(newForm);
 						newrow.appendChild(newButton);
 					}
-					
-					this.registeredstudentscontainerbody.appendChild(newrow);
 
+					this.registeredstudentscontainerbody.appendChild(newrow);
 				}
 			}
 
 		};
+		
+		this.sortByColumn = function(columnIndex, columnType) {
+			var self = this;
+			var rows = Array.from(self.registeredstudentscontainerbody.getElementsByTagName('tr'));
+			
+			this.detectOrder(columnIndex,columnType);
+			
+			rows.sort(function(a, b) {
+
+				var valueA = a.cells[columnIndex].innerText.toLowerCase();
+				var valueB = b.cells[columnIndex].innerText.toLowerCase();
+
+				if (self.currentOrder === "desc") {//devo ordinare in modo ascendente ovvero invertire l'ordine
+					if (columnType !== "mark") {
+						if (valueA == undefined)
+							return -1; //valore nullo più piccolo di qualsiasi altro valore;
+						if (valueB == undefined)
+							return 1;
+
+						return valueA.localeCompare(valueB);
+					} else {
+						if (valueA == undefined)
+							return -1; //valore nullo più piccolo di qualsiasi altro valore;
+						if (valueB == undefined)
+							return 1;
+						if ((!isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))
+							|| (isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+							return valueA.localeCompare(valueB);
+						}
+						if ((!isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+							return 1;
+						}
+						if ((isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))) {
+							return -1;
+						}
+					}
+				}
+				else {
+
+					if (columnType !== "mark") {
+						if (valueA == undefined)
+							return 1; //valore nullo più piccolo di qualsiasi altro valore;
+						if (valueB == undefined)
+							return -1;
+
+						return valueB.localeCompare(valueA);
+					} else {
+						if (valueA == undefined)
+							return 1; //valore nullo più piccolo di qualsiasi altro valore;
+						if (valueB == undefined)
+							return -1;
+						if ((!isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))
+							|| (isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+							return valueB.localeCompare(valueA);
+						}
+						if ((!isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+							return -1;
+						}
+						if ((isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))) {
+							return 1;
+						}
+					}
+				}
+
+			});
+
+			// Rimuovi le righe esistenti dalla tabella
+			while (self.registeredstudentscontainerbody.firstChild) {
+				self.registeredstudentscontainerbody.removeChild(self.registeredstudentscontainerbody.firstChild);
+			}
+
+			// Aggiungi le righe ordinate alla tabella
+			rows.forEach(function(row) {
+				self.registeredstudentscontainerbody.appendChild(row);
+			});
+			
+		}
+		
+		this.detectOrder = function(columnIndex, columnType) {
+			var self = this;
+			var rows = Array.from(self.registeredstudentscontainerbody.getElementsByTagName('tr'));
+			var valueA;
+			var valueB;
+			//Trovo il tipo di ordine corrente per la colonna selezionata
+			if (columnType !== "mark") {
+				for (var i = 0; i < rows.length - 1; i++) {
+					valueA = rows[i].cells[columnIndex].innerText.toLowerCase();
+					valueB = rows[i + 1].cells[columnIndex].innerText.toLowerCase();
+
+					if (valueA.localeCompare(valueB) < 0) {
+						self.currentOrder = "asc";
+						break;
+					} else if (valueA.localeCompare(valueB) > 0) {
+						self.currentOrder = "desc";
+						break;
+					} else {
+						self.currentOrder = "asc";
+					}
+
+				}
+			}
+			else {
+				var comparation = 0;
+				for (var i = 0; i < rows.length - 1; i++) {
+					valueA = rows[i].cells[columnIndex].innerText.toLowerCase();
+					valueB = rows[i + 1].cells[columnIndex].innerText.toLowerCase();
+					if (valueA == undefined) {
+						comparation = 1; //valore nullo più piccolo di qualsiasi altro valore;
+					}
+					else if (valueB == undefined) {
+						comparation = -1;
+					}
+					else if ((!isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))
+						|| (isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+						comparation = valueA.localeCompare(valueB);
+					}
+					else if ((!isNaN(parseInt(valueA)) && isNaN(parseInt(valueB)))) {
+						comparation = 1;
+					}
+					else if ((isNaN(parseInt(valueA)) && !isNaN(parseInt(valueB)))) {
+						comparation = -1;
+					}
+
+
+					if (comparation < 0) {
+						self.currentOrder = "asc";
+						break;
+					} else if (comparation > 0) {
+						self.currentOrder = "desc";
+						break;
+					} else {
+						self.currentOrder = "asc";
+					}
+
+				}
+			}
+		}
+
 	}
 	
 	function SingleStudentDetails(alert, studentDetailsContainer){
@@ -512,20 +653,42 @@
 			          if (req.readyState === 4) {
 			            let message = req.responseText; 
 			            if (req.status === 200) { 
-							if(JSON.parse(message) !== null){
+							if(message!== null && JSON.parse(message) !== -1){
 								registeredStudentsDetails.show(courseId, appealDate);
 								reportDetails.show(JSON.parse(message), courseId, appealDate);
+							}else{
+								alertContainer.textContent = "Impossible to create a new report, there are no published evaluations";
 							}
 			            } else {
 			              	alertContainer.textContent = message;
 			            }
 			          }
 			        }
-			      );
-			    } else {
-			      form.reportValidity(); // trigger the client-side HTML error messaging
-			    }
+					);
+				} else {
+					form.reportValidity(); // trigger the client-side HTML error messaging
+				}
 			}, false);
+			
+			
+			// Aggiungi un gestore di eventi di clic alle etichette delle colonne
+			var columnLabels = document.querySelectorAll('.column-label');
+
+			columnLabels.forEach(function(label) {
+				console.log("label" + label);
+				var anchor = label.querySelector('a');
+				var columnType = anchor.getAttribute("data-column");
+				label.querySelector('a').addEventListener('click', function(event) {
+					// Ottieni l'indice dell'ancora cliccata all'interno delle etichette di colonna
+					columnIndex = Array.from(label.parentNode.children).indexOf(label);
+
+					// Utilizza l'indice della colonna per eseguire le operazioni desiderate
+					console.log("Colonna selezionata: " + columnIndex);
+					console.log("columnType: " + columnType);
+					registeredStudentsDetails.sortByColumn(columnIndex, columnType);
+				});
+			});
+
 			
 			/*	      
 					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission

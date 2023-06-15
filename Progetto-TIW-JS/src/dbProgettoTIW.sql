@@ -1,8 +1,10 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `dbprogettotiw` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `dbprogettotiw`;
+-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: dbprogettotiw
 -- ------------------------------------------------------
--- Server version	8.0.33
+-- Server version	8.0.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -88,7 +90,7 @@ CREATE TABLE `frequenta` (
 
 LOCK TABLES `frequenta` WRITE;
 /*!40000 ALTER TABLE `frequenta` DISABLE KEYS */;
-INSERT INTO `frequenta` VALUES (9899,1),(9236,2),(9899,3),(9236,4),(9899,4),(9236,5);
+INSERT INTO `frequenta` VALUES (9899,1),(9236,2),(9899,3),(9236,4),(9876,4),(9899,4),(9999,4),(9236,5);
 /*!40000 ALTER TABLE `frequenta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -150,7 +152,7 @@ CREATE TABLE `iscritto` (
 
 LOCK TABLES `iscritto` WRITE;
 /*!40000 ALTER TABLE `iscritto` DISABLE KEYS */;
-INSERT INTO `iscritto` VALUES (9236,2,'2023-06-10',NULL,'19','PUBBLICATO'),(9236,2,'2023-07-20',NULL,NULL,'NON_INSERITO'),(9236,4,'2023-07-05',2,'28','VERBALIZZATO'),(9236,5,'2023-06-19',1,'RIMANDATO','VERBALIZZATO'),(9899,1,'2023-06-23',NULL,'18','RIFIUTATO'),(9899,1,'2023-07-12',NULL,NULL,'NON_INSERITO'),(9899,3,'2023-06-25',NULL,'24','INSERITO'),(9899,4,'2023-07-05',2,'30L','VERBALIZZATO');
+INSERT INTO `iscritto` VALUES (9123,4,'2023-07-05',NULL,NULL,'NON_INSERITO'),(9236,2,'2023-06-10',NULL,'19','PUBBLICATO'),(9236,2,'2023-07-20',NULL,NULL,'NON_INSERITO'),(9236,4,'2023-07-05',NULL,NULL,'NON_INSERITO'),(9236,5,'2023-06-19',1,'RIMANDATO','VERBALIZZATO'),(9876,4,'2023-07-05',NULL,'RIPROVATO','PUBBLICATO'),(9899,1,'2023-06-23',NULL,'18','RIFIUTATO'),(9899,1,'2023-07-12',NULL,NULL,'NON_INSERITO'),(9899,3,'2023-06-25',NULL,'24','INSERITO'),(9899,4,'2023-07-05',2,'30L','VERBALIZZATO'),(9999,4,'2023-07-05',NULL,'29','PUBBLICATO');
 /*!40000 ALTER TABLE `iscritto` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -180,7 +182,7 @@ CREATE TABLE `utente` (
 
 LOCK TABLES `utente` WRITE;
 /*!40000 ALTER TABLE `utente` DISABLE KEYS */;
-INSERT INTO `utente` VALUES (9236,'Luca','Rossi','rossi','studente','luca.rossi@caso.it','informatica'),(9333,'Giovanna','Lucia','lucia','docente',NULL,NULL),(9572,'Francesco','Lepore','password','docente',NULL,NULL),(9899,'Marco','Ciufalo','ciufalo','studente','marchino@prova.com','matematica');
+INSERT INTO `utente` VALUES (9123,'Manuela','Tommasi','tommasi','studente','manu.tom@caso.it','informatica'),(9236,'Luca','Rossi','rossi','studente','luca.rossi@caso.it','informatica'),(9333,'Giovanna','Lucia','lucia','docente',NULL,NULL),(9572,'Francesco','Lepore','password','docente',NULL,NULL),(9876,'Carlo','Mancini','mancio','studente','mancio@prova.com','informatica'),(9899,'Marco','Ciufalo','ciufalo','studente','marchino@prova.com','matematica'),(9999,'Sara','Nunziante','nunziante','studente','saretta@prova.com','matematica');
 /*!40000 ALTER TABLE `utente` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -218,4 +220,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-26 16:45:57
+-- Dump completed on 2023-06-15 19:09:04

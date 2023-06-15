@@ -100,10 +100,11 @@ public class CreateReport extends HttpServlet {
 			verbaliAppello = reportDAO.findReportByAppeal(appeal);
 			
 			newReport = reportDAO.findReportById(Integer.parseInt(report));
-//			if(newReport == null) {
-//				response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
-//				return;
-//			}
+			if(newReport == null) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("Report not found ");
+				return;
+			}
 			if(!appelliDocente.contains(appeal) || !verbaliAppello.contains(newReport) ){
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				response.getWriter().println("No appeals on this date for this course");
@@ -187,7 +188,8 @@ public class CreateReport extends HttpServlet {
 			newReport = reportDAO.createReport(appeal);
 			
 //			if(newReport == null) {
-//				//response.sendRedirect(getServletContext().getContextPath() + "/GetRegisteredStudentsByAppeal?idCorso="+corso+"&dataAppello="+dataAppello+"&sortBy=matricola&order=ASC");
+//				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//				response.getWriter().println("Impossible to create a new report, there are no published evaluations");
 //				return;
 //			}
 		}catch (IllegalArgumentException e) {
@@ -200,7 +202,13 @@ public class CreateReport extends HttpServlet {
 			return;
 		}
 		
-		String json = new Gson().toJson(newReport.getId());
+		String json = new Gson().toJson(-1) ;
+		
+		if(newReport != null) {
+			json = new Gson().toJson(newReport.getId()); 
+			System.out.println("sono qui");
+		}
+		
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");

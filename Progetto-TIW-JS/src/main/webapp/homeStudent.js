@@ -315,6 +315,8 @@
 			            let message = req.responseText; 
 			            if (req.status === 200) { 
 			              evaluationDetails.show(courseId, appealDate);
+			              let rejectionMessage = new PersonalMessage("The evaluation has been rejected ", alertContainer);
+			              rejectionMessage.show;
 			            } else {
 			              alertContainer.textContent = message;
 			            }

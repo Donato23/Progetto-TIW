@@ -115,7 +115,7 @@ public class GetEvaluationByAppeal extends HttpServlet {
 		}
 		// String json = new Gson().toJson(registeredStudentsEvaluations);
 		Gson gson = new Gson();
-		JsonObject evaluationData = new JsonObject();
+		JsonObject evaluationData = new JsonObject();//gson.toJson superfluo sono gia stringhe tranne id
 		evaluationData.addProperty("userId", gson.toJson(u.getMatricola()));
 		evaluationData.addProperty("nomeStudente", gson.toJson(u.getNome()));
 		evaluationData.addProperty("cognomeStudente", gson.toJson(u.getCognome()));

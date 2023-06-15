@@ -29,10 +29,21 @@
 		</tr>
 		<tr>
 			<td>
-				<p><span id="id_registeredstudentsstring"></span></p>
-				<table id="id_registeredstudentscontainer" class="boxed" style="visibility: hidden;">
+				<p>
+					<span id="id_registeredstudentsstring"></span>
+				</p>
+				<table id="id_registeredstudentscontainer" class="boxed"
+					style="visibility: hidden;">
 					<thead>
-						<tr> <th>Id number</th> <th>Name</th> <th>Surname</th> <th>E-mail</th> <th>Degree</th> <th>Mark</th> <th>Evaluation state</th></tr>
+						<tr>
+							<th class="column-label"><a href="#" data-column="idNumber">Id number</a></th>
+							<th class="column-label"><a href="#" data-column="name">Name</a></th>
+							<th class="column-label"><a href="#" data-column="surname">Surname</a></th>
+							<th class="column-label"><a href="#" data-column="email">E-mail</a></th>
+							<th class="column-label"><a href="#" data-column="degree">Degree</a></th>
+							<th class="column-label"><a href="#" data-column="mark">Mark</a></th>
+							<th class="column-label"><a href="#" data-column="evaluationState">Evaluation state</a></th>
+						</tr>
 					</thead>
 					<tbody id="id_registeredstudentscontainerbody">
 						<!-- <tr>
@@ -59,9 +70,9 @@
 		<tr>
 			<td>
 				<form id="id_publishbutton" action="#">
-					<input type="hidden" name="appealDate"></input>
-					<input type="hidden" name="courseId"></input>
-					<input type="button" name="publish" value="Publish"></input>
+					<input type="hidden" name="appealDate"></input> <input
+						type="hidden" name="courseId"></input> <input type="button"
+						name="publish" value="Publish"></input>
 				</form>
 			</td>
 		</tr>
