@@ -85,6 +85,56 @@
 				</form>
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<form id="id_multipleinsertionbutton" action="#">
+					<input type="hidden" name="dataAppello"></input>
+					<input type="hidden" name="idCorso"></input>
+					<input type="button" name="multipleinsertion" value="Multiple insertion"></input>
+				</form>
+				<div id="id_multipleinsertionmodal" class="modal">	
+				  <!-- Modal content -->
+				  <div class="modal-content">
+				    <span class="close">&times;</span>
+				    <p>Insert multiple evaluations:</p>
+				    <table id="id_multipleinsertioncontainer">
+				    	<thead>
+				    		<th>Id number</th>
+				    		<th>Name</th>
+				    		<th>Surname</th>
+				    		<th>E-mail</th>
+				    		<th>Degree</th>
+				    		<th>Mark</th>
+				    		<th>Evaluation state</th>
+				    	</thead>
+				    	<tbody id="id_multipleinsertioncontainerbody">
+<!-- 				    	 <tr>
+				    			<td>studentId</td>
+				    			<td>studentName</td>
+				    			<td>studentSurname</td>
+				    			<td>studentEmail</td>
+				    			<td>studentDegree</td>
+				    			<td>
+				    				<form id="id_modalevaluationform" action="#">
+				    					<select id="id_modalevaluationselect" name="modalEvaluation">
+				    						<option></option>
+				    						<option>ASSENTE</option>
+				    					</select>
+				    				</form>
+				    			</td>
+				    		</tr> -->
+				    	</tbody>
+				    </table>
+				    
+				    <form id="id_multipleinsertionsubmitbutton" action="#">
+					    <input type="hidden" name="appealDate"></input>
+						<input type="hidden" name="courseId"></input>
+						<input type="button" name="multipleinsertionsend" value="Send"></input>
+					</form>
+				  </div>
+				</div>
+			</td>
+		</tr>
 		<tr id="id_studentdetailscontainer" style="visibility: hidden;">
 			<td>
 				<h2>Student details:</h2>

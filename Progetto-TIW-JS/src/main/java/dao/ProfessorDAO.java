@@ -102,6 +102,56 @@ public class ProfessorDAO {
 		return registeredStudents;
 	}
 	
+	public Map<User, Mark> findRegisteredStudentsWithoutEvaluationByAppeal(int courseId, Date appealDate) throws SQLException{		
+		String query = "SELECT * FROM iscritto, utente WHERE matricolastudente = matricola AND appello = ? AND corso = ? AND statovalutazione = 'NON_INSERITO'";
+		Map<User, Mark> registeredStudentsWithoutEvaluation = new LinkedHashMap<>();
+		PreparedStatement pstatement = null;
+		ResultSet result = null;
+		User student = null;
+		Mark mark = null;
+		
+		try{			
+			pstatement = con.prepareStatement(query);
+			pstatement.setDate(1, appealDate);
+			pstatement.setInt(2, courseId);
+			
+			result = pstatement.executeQuery();
+			while(result.next()) {
+				student = new User();
+				mark = new Mark();
+				student.setRuolo("studente");
+				student.setMatricola(result.getInt("matricola"));
+				student.setNome(result.getString("nome"));
+				student.setCognome(result.getString("cognome"));
+				student.setMail(result.getString("email"));
+				student.setCorsoDiLaurea(result.getString("corsodilaurea"));
+				mark.setMark(result.getString("voto"));
+				mark.setStatoValutazione(EvaluationState.valueOf(result.getString("statovalutazione")));
+				
+				registeredStudentsWithoutEvaluation.put(student, mark);
+			}
+		} catch (SQLException e){
+			throw new SQLException(e);
+		} finally {
+			try {
+				if (result != null) {
+					result.close();
+				}
+			} catch (Exception e1) {
+				throw new SQLException("Cannot close result");
+			}
+			try {
+				if (pstatement != null) {
+					pstatement.close();
+				}
+			} catch (Exception e1) {
+				throw new SQLException("Cannot close statement");
+			}
+		}
+		
+		return registeredStudentsWithoutEvaluation;
+	}
+	
 	
 	public void publishEvaluation(Appeal appeal) throws SQLException{
 		String query = "UPDATE iscritto SET statovalutazione = 'PUBBLICATO' WHERE statovalutazione = 'INSERITO' AND appello = ? AND corso = ?";

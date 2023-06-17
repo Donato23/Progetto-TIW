@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.AppealDAO;
 import dao.ProfessorDAO;
 import javaBeans.Appeal;
 import javaBeans.User;
@@ -96,8 +98,18 @@ public class PublishEvaluation extends HttpServlet {
 			return;
 		}
 		
+		AppealDAO appealDAO = new AppealDAO(connection);
+		List<Appeal> appelliDocente = null;
 		ProfessorDAO professorDao = new ProfessorDAO(connection); 
 		try {
+			appelliDocente = appealDAO.findAppealByCourseAndProfessor(u.getMatricola(), appeal.getIdCorso());
+			
+			if(!appelliDocente.contains(appeal)){
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No appeals on this date for this course");
+				return;
+			}
+			
 			professorDao.publishEvaluation(appeal);
 		}catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);

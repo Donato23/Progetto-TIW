@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,19 +29,19 @@ import javaBeans.Appeal;
 import javaBeans.Mark;
 import javaBeans.User;
 
-/**s
- * Servlet implementation class GoToHomeProfessorAppeals
+/**
+ * Servlet implementation class GetRegisteredStudentsWithoutEvaluationByAppeal
  */
-@WebServlet("/GetRegisteredStudentsByAppeal")
+@WebServlet("/GetRegisteredStudentsWithoutEvaluationByAppeal")
 @MultipartConfig
-public class GetRegisteredStudentsByAppeal extends HttpServlet {
+public class GetRegisteredStudentsWithoutEvaluationByAppeal extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GetRegisteredStudentsByAppeal() {
+    public GetRegisteredStudentsWithoutEvaluationByAppeal() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -86,7 +85,7 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 		ProfessorDAO professorDAO = new ProfessorDAO(connection);
 		AppealDAO appealDAO = new AppealDAO(connection);
 		
-		Map<User, Mark> registeredStudentsEvaluations = new HashMap<>();
+		Map<User, Mark> registeredStudentsWithoutEvaluations = new HashMap<>();
 		List<Appeal> appelliDocente = null;
 		Appeal appeal = new Appeal();
 		int idCorso;
@@ -108,10 +107,9 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 				if(!appelliDocente.contains(appeal)){
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					response.getWriter().println("Wrong parameter");
-					return;
 				}
 				
-				registeredStudentsEvaluations = professorDAO.findRegisteredStudentsByAppeal(idCorso, appealDate);
+				registeredStudentsWithoutEvaluations = professorDAO.findRegisteredStudentsWithoutEvaluationByAppeal(idCorso, appealDate);
 			}
 			else {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -123,6 +121,7 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 		}catch(IllegalArgumentException e){
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("PAR ERROR: parameter is not valid");
+			return;
 		}
 		catch (SQLException e) {
 			// throw new ServletException(e);
@@ -133,15 +132,15 @@ public class GetRegisteredStudentsByAppeal extends HttpServlet {
 		
 		JsonArray registeredStudentsData = new JsonArray();
 		
-		for(User key : registeredStudentsEvaluations.keySet()){
+		for(User key : registeredStudentsWithoutEvaluations.keySet()){
 			JsonObject studentData = new JsonObject();
 			studentData.addProperty("studentId", key.getMatricola());
 			studentData.addProperty("studentName", key.getNome());
 			studentData.addProperty("studentSurname", key.getCognome());
 			studentData.addProperty("studentEmail", key.getMail());
 			studentData.addProperty("studentDegree", key.getCorsoDiLaurea());
-			studentData.addProperty("studentMark", registeredStudentsEvaluations.get(key).getMark());
-			studentData.addProperty("studentEvaluationState", registeredStudentsEvaluations.get(key).getStatoValutazione().toString());
+			studentData.addProperty("studentMark", registeredStudentsWithoutEvaluations.get(key).getMark());
+			studentData.addProperty("studentEvaluationState", registeredStudentsWithoutEvaluations.get(key).getStatoValutazione().toString());
 			registeredStudentsData.add(studentData);
 		}
 		

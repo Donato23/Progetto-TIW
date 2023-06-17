@@ -97,7 +97,8 @@ public class GetEvaluationByAppeal extends HttpServlet {
 				selAppeal.setData(appello);
 			}
 			if (!studentDAO.registeredForAppeal(mStu, selAppeal)) {
-				response.sendRedirect(getServletContext().getContextPath() + "/GoToHomeStudentAppeals?idCorso="+corso);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("You are not registered for this appeal!");
 				return;
 			}	
 			mark = studentDAO.findEvaluationByAppeal(mStu,selAppeal);

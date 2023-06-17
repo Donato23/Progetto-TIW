@@ -111,6 +111,8 @@ public class RejectEvaluation extends HttpServlet {
 			response.getWriter().println("Failure in database extraction");
 			return;
 		}
+		
+		response.setStatus(HttpServletResponse.SC_OK);
 //		String ctxpath = getServletContext().getContextPath();
 //		String path = ctxpath + "/GetEvaluationByAppeal?dataAppello=" + selAppeal.getData() + "&idCorso=" + selAppeal.getIdCorso();
 //		response.sendRedirect(path);

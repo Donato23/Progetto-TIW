@@ -1,7 +1,8 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
-	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails, reportDetails;
-	let publishButton, reportButton;
+	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails, reportDetails, multipleInsertionModalPage;
+	let publishButton, reportButton, multipleInsertionButton, sendMultipleInsertionButton;
+	let multipleInsertionModal;
 
 	window.addEventListener("load", () => {
 		if (JSON.parse(sessionStorage.getItem("user")).matricola == null) {
@@ -32,9 +33,10 @@
 			publishButton.style.visibility = "hidden";
 			reportButton.style.visibility = "hidden";
 			reportDetails.reportContainer.style.visibility = "hidden";
+			multipleInsertionButton.style.visibility = "hidden";
 		}
 
-		this.show = function(next) {
+		this.show = function() {
 			var self = this;
 			makeCall("GET", "GoToHomeProfessor", null,
 				function(req) {
@@ -47,7 +49,6 @@
 								return;
 							}
 							self.update(coursesToShow); // self visible by closure
-							if (next) next(); // show the default element of the list if present
 
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
@@ -85,14 +86,6 @@
 			this.listcontainer.style.visibility = "visible";
 
 		}
-
-		/*	    this.autoclick = function(courseId) {
-				  var e = new Event("click");
-				  var selector = "a[courseid='" + courseId + "']";
-				  var anchorToClick =  // the first mission or the mission with id = missionId
-					(courseId) ? document.querySelector(selector) : this.listcontainerbody.querySelectorAll("a")[0];
-				  if (anchorToClick) anchorToClick.dispatchEvent(e);
-				}*/
 	}
 
 	function CourseAppeals(_alert) {
@@ -123,6 +116,7 @@
 							publishButton.style.visibility = "hidden";
 							reportButton.style.visibility = "hidden";
 							reportDetails.reportContainer.style.visibility = "hidden";
+							multipleInsertionButton.style.visibility = "hidden";
 							
 							self.alert.textContent = "";
 							self.update(appealsToShow); // self visible by closure
@@ -168,8 +162,6 @@
 			});
 			this.listcontainer.style.visibility = "visible";
 		};
-
-		this.reset = function() { };
 	}
 	
 
@@ -187,32 +179,17 @@
 					if (req.readyState == 4) {
 						var message = req.responseText;
 						if (req.status == 200) {
-							var obj = JSON.parse(req.responseText);
-							var objLength = 0;
-							
-							// Crea un oggetto JavaScript vuoto per conservare gli oggetti ricostruiti
-							var reconstructedRegisteredStudents = {};
-
-							// Scorrere tutte le chiavi nell'oggetto JSON
-							for (var key in obj) {
-								if (obj.hasOwnProperty(key)) {
-									objLength += 1;
-									var entry = obj[key];
-									var originalKey = JSON.parse(entry.key);
-									var value = JSON.parse(entry.value);
-									// Ricostruisci l'oggetto originale utilizzando la chiave originale
-									reconstructedRegisteredStudents[JSON.stringify(originalKey)] = value;
-								}
-							}
+							var registeredStudents = JSON.parse(req.responseText);
 							
 							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
-														
-							if (objLength == 0) {
+													
+							if (message === "[]") { // the server's response is empty
 								if(self.registeredStudentsString != undefined){
 									self.registeredstudentscontainer.style.visibility = "hidden";
 									publishButton.style.visibility = "hidden";
 									reportButton.style.visibility = "hidden";
 									reportDetails.reportContainer.style.visibility = "hidden";
+									multipleInsertionButton.style.visibility = "hidden";
 									self.registeredStudentsString.refresh();
 								}
 								self.alert.textContent = "No registered students for this appeal!";
@@ -224,9 +201,9 @@
 							publishButton.style.visibility = "visible";
 							reportButton.style.visibility = "visible";
 							reportDetails.reportContainer.style.visibility = "hidden";
+							multipleInsertionButton.style.visibility = "visible";
 							
-							
-							self.update(reconstructedRegisteredStudents, appealDate, courseId);
+							self.update(registeredStudents, appealDate, courseId);
 						} else if (req.status == 403) {
 							window.location.href = req.getResponseHeader("Location");
 							window.sessionStorage.removeItem('user');
@@ -247,43 +224,40 @@
 			  this.registeredstudentscontainerbody.removeChild(this.registeredstudentscontainerbody.firstChild);
 			}
 			
+			console.log(registeredStudentsMap);
+			
 			publishButton.querySelector("input[type = 'hidden'][name = 'appealDate']").value = appealDate;
 			publishButton.querySelector("input[type = 'hidden'][name = 'courseId']").value = courseId;
 			reportButton.querySelector("input[type = 'hidden'][name = 'dataAppello']").value = appealDate;
 			reportButton.querySelector("input[type = 'hidden'][name = 'idCorso']").value = courseId;
+			multipleInsertionButton.querySelector("input[type = 'hidden'][name = 'dataAppello']").value = appealDate;
+			multipleInsertionButton.querySelector("input[type = 'hidden'][name = 'idCorso']").value = courseId;
 			
 			this.registeredStudentsString = new PersonalMessage("These are the registered students for the " + appealDate + " appeal:",
 					document.getElementById("id_registeredstudentsstring"));
 			this.registeredStudentsString.show();
 
-			var originalStudent;
-			for (var user in registeredStudentsMap) {
-				if (registeredStudentsMap.hasOwnProperty(user)) {					
-					originalStudent = JSON.parse(user);
+			registeredStudentsMap.forEach(function(user){
 					var newrow = document.createElement("tr");
-					this.registeredstudentscontainerbody.appendChild(newrow);
+					self.registeredstudentscontainerbody.appendChild(newrow);
 					var newidnumber = document.createElement("td");
-					newidnumber.textContent = originalStudent.matricola;
+					newidnumber.textContent = user.studentId;
 					var newname = document.createElement("td");
-					newname.textContent = originalStudent.nome;
+					newname.textContent = user.studentName;
 					var newsurname = document.createElement("td");
-					newsurname.textContent = originalStudent.cognome;
+					newsurname.textContent = user.studentSurname;
 					var newemail = document.createElement("td");
-					newemail.textContent = originalStudent.mail;
+					newemail.textContent = user.studentEmail;
 					var newdegree = document.createElement("td");
-					newdegree.textContent = originalStudent.corsoDiLaurea;
+					newdegree.textContent = user.studentDegree;
 					var newmark = document.createElement("td");
-					newmark.textContent = registeredStudentsMap[user].mark;
+					newmark.textContent = user.studentMark;
 					var newevaluationstate = document.createElement("td");
-					newevaluationstate.textContent = registeredStudentsMap[user].statoValutazione;
+					newevaluationstate.textContent = user.studentEvaluationState;
 
 					newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
 					
-					
-					
-					
-					// Se è possibile modificare il voto dello studente, aggiungo il pulsane modifica
-					if(registeredStudentsMap[user].statoValutazione === "INSERITO" || registeredStudentsMap[user].statoValutazione === "NON_INSERITO"){
+					if(user.studentEvaluationState === "INSERITO" || user.studentEvaluationState === "NON_INSERITO"){
 						var newButton = document.createElement("td");
 						var newForm = document.createElement("form");
 						//newForm.setAttribute("id", "id_modifybutton")
@@ -299,7 +273,7 @@
 						var newInputStudentId = document.createElement("input");
 						newInputStudentId.setAttribute("type", "hidden");
 						newInputStudentId.setAttribute("name", "studentId");
-						newInputStudentId.value = originalStudent.matricola;
+						newInputStudentId.value = user.studentId;
 						var newInputModify = document.createElement("input");
 						newInputModify.setAttribute("type", "button");
 						newInputModify.setAttribute("name", "Modify");
@@ -308,6 +282,7 @@
 						newInputModify.addEventListener("click",  function(e) { // called when one clicks the button
 							publishButton.style.visibility = "hidden";
 							reportButton.style.visibility = "hidden";
+							multipleInsertionButton.style.visibility = "hidden";
 							
 					        let form = e.target.closest("form"); // example of DOM navigation from event object
 					        if (form.checkValidity()) {
@@ -338,11 +313,9 @@
 						newButton.appendChild(newForm);
 						newrow.appendChild(newButton);
 					}
-
-					this.registeredstudentscontainerbody.appendChild(newrow);
-				}
-			}
-
+					
+					self.registeredstudentscontainerbody.appendChild(newrow);
+			});
 		};
 		
 		this.sortByColumn = function(columnIndex, columnType) {
@@ -565,12 +538,7 @@
 			document.getElementById("id_reportcourseid").textContent = courseId;
 			document.getElementById("id_reportappealdate").textContent = appealDate;
 			
-			report.studentsData.forEach(function(sData){
-				/*console.log(sData.studentId);
-				console.log(sData.studentName);
-				console.log(sData.studentSurname);
-				console.log(sData.studentMark);*/
-				
+			report.studentsData.forEach(function(sData){				
 				var newRow = document.createElement("tr");
 				var newStudentId = document.createElement("td");
 				newStudentId.textContent = sData.studentId;
@@ -587,6 +555,124 @@
 			
 			this.reportContainer.style.visibility = "visible";
 		}
+	}
+	
+	function ModalPage(alert, modalContainerBody, modalContainer){
+		this.alert = alert;
+		this.modalContainerBody = modalContainerBody;
+		this.modalContainer = modalContainer;
+		this.registeredStudentsWithoutEvaluation;
+		
+		this.show = function(courseId, appealDate) {
+			var self = this;
+			makeCall("GET", "GetRegisteredStudentsWithoutEvaluationByAppeal?idCorso=" + courseId + "&dataAppello=" + appealDate, null,
+				function(req) {
+					if (req.readyState == 4) {
+						var message = req.responseText;
+						if (req.status == 200) {
+							self.registeredStudentsWithoutEvaluation = JSON.parse(req.responseText);
+							
+							singleStudentDetails.studentDetailsContainer.style.visibility = "hidden";
+													
+							if (message === "[]") { // the server's response is empty
+								self.alert.textContent = "Function not available: there are no students without an evaluation!";
+								return;
+							}
+							
+							multipleInsertionModal.style.display = "block";
+							self.update(self.registeredStudentsWithoutEvaluation, appealDate, courseId);
+						} else if (req.status == 403) {
+							window.location.href = req.getResponseHeader("Location");
+							window.sessionStorage.removeItem('user');
+						}
+						else {
+							self.alert.textContent = message;
+
+						}
+					}
+				}
+			);
+		};
+
+		this.update = function(registeredStudentsWithoutEvaluation, appealDate, courseId) {
+			var self = this;
+			
+			while (this.modalContainerBody.firstChild) {
+			  this.modalContainerBody.removeChild(this.modalContainerBody.firstChild);
+			}
+			
+			let form = document.getElementById("id_multipleinsertionsubmitbutton");
+			form.querySelector("input[type = 'hidden'][name = 'appealDate']").value = appealDate
+			form.querySelector("input[type = 'hidden'][name = 'courseId']").value = courseId;
+
+			registeredStudentsWithoutEvaluation.forEach(function(user){
+				var newrow = document.createElement("tr");
+				var newidnumber = document.createElement("td");
+				newidnumber.textContent = user.studentId;
+				var newname = document.createElement("td");
+				newname.textContent = user.studentName;
+				var newsurname = document.createElement("td");
+				newsurname.textContent = user.studentSurname;
+				var newemail = document.createElement("td");
+				newemail.textContent = user.studentEmail;
+				var newdegree = document.createElement("td");
+				newdegree.textContent = user.studentDegree;
+				var newmark = document.createElement("td");
+				var newmarkform = document.createElement("form");
+				newmark.appendChild(newmarkform);
+				newmarkform.setAttribute("id", "id_modalevaluationform");
+				newmarkform.setAttribute("action", "#");
+				var newmarkselection = document.createElement("select");
+				newmarkselection.setAttribute("name", "modalEvaluation");
+				newmarkselection.setAttribute("id", "id_modalevaluationselect" + user.studentId);
+				newmarkform.appendChild(newmarkselection); 
+				var newmarkselectionempty = document.createElement("option");
+				newmarkselectionempty.textContent = "";
+				var newmarkselectionassente = document.createElement("option");
+				newmarkselectionassente.textContent = "ASSENTE";
+				var newmarkselectionrimandato = document.createElement("option");
+				newmarkselectionrimandato.textContent = "RIMANDATO";
+				var newmarkselectionriprovato = document.createElement("option");
+				newmarkselectionriprovato.textContent = "RIPROVATO";
+				var newmarkselection18 = document.createElement("option");
+				newmarkselection18.textContent = "18";
+				var newmarkselection19 = document.createElement("option");
+				newmarkselection19.textContent = "19";
+				var newmarkselection20 = document.createElement("option");
+				newmarkselection20.textContent = "20";
+				var newmarkselection21 = document.createElement("option");
+				newmarkselection21.textContent = "21";
+				var newmarkselection22 = document.createElement("option");
+				newmarkselection22.textContent = "22";
+				var newmarkselection23 = document.createElement("option");
+				newmarkselection23.textContent = "23";
+				var newmarkselection24 = document.createElement("option");
+				newmarkselection24.textContent = "24";
+				var newmarkselection25 = document.createElement("option");
+				newmarkselection25.textContent = "25";
+				var newmarkselection26 = document.createElement("option");
+				newmarkselection26.textContent = "26";
+				var newmarkselection27 = document.createElement("option");
+				newmarkselection27.textContent = "27";
+				var newmarkselection28 = document.createElement("option");
+				newmarkselection28.textContent = "28";
+				var newmarkselection29 = document.createElement("option");
+				newmarkselection29.textContent = "29";
+				var newmarkselection30 = document.createElement("option");
+				newmarkselection30.textContent = "30";
+				var newmarkselection30L = document.createElement("option");
+				newmarkselection30L.textContent = "30L";
+				newmarkselection.append(newmarkselectionempty, newmarkselectionassente, newmarkselectionrimandato, newmarkselectionriprovato, 
+					newmarkselection18, newmarkselection19, newmarkselection20, newmarkselection21, newmarkselection22, newmarkselection23, 
+					newmarkselection24, newmarkselection25, newmarkselection26, newmarkselection27, newmarkselection28, newmarkselection29, 
+					newmarkselection30, newmarkselection30L);
+				var newevaluationstate = document.createElement("td");
+				newevaluationstate.textContent = user.studentEvaluationState;
+
+				newrow.append(newidnumber, newname, newsurname, newemail, newdegree, newmark, newevaluationstate);
+				self.modalContainerBody.appendChild(newrow);
+			});
+		};
 	}
 
 	function PageOrchestrator() {
@@ -670,7 +756,6 @@
 				}
 			}, false);
 			
-			
 			// Aggiungi un gestore di eventi di clic alle etichette delle colonne
 			var columnLabels = document.querySelectorAll('.column-label');
 
@@ -689,6 +774,63 @@
 				});
 			});
 
+			multipleInsertionButton = document.getElementById("id_multipleinsertionbutton");
+			let closeModal = document.getElementsByClassName("close")[0];
+			multipleInsertionModal = document.getElementById("id_multipleinsertionmodal");
+			multipleInsertionModalPage = new ModalPage(alertContainer, document.getElementById("id_multipleinsertioncontainerbody"), document.getElementById("id_multipleinsertioncontainer"));
+			multipleInsertionButton.addEventListener("click", function(e){
+				let form = e.target.closest("form");
+				let appealDate = form.querySelector("input[type = 'hidden'][name = 'dataAppello']").value;
+				let courseId = form.querySelector("input[type = 'hidden'][name = 'idCorso']").value;
+				multipleInsertionModalPage.show(courseId, appealDate);
+				
+			}, false);
+			
+			closeModal.addEventListener("click", function(e){
+				multipleInsertionModal.style.display = "none";
+			}, false);
+			
+			// When the user clicks anywhere outside of the modal, close it
+			window.onclick = function(event) {
+			  if (event.target == multipleInsertionModal) {
+			    multipleInsertionModal.style.display = "none";
+			  }
+			}
+			
+			sendMultipleInsertionButton = document.getElementById("id_multipleinsertionsubmitbutton");
+			sendMultipleInsertionButton.addEventListener("click", function(e){
+				let form = e.target.closest("form");
+				let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
+				let courseId = form.querySelector("input[type = 'hidden'][name = 'courseId']").value;
+				// ciclo lungo tutta la lista di studenti con voto non_inserito
+				multipleInsertionModalPage.registeredStudentsWithoutEvaluation.forEach(function(student){
+					let studentEvaluation = document.getElementById("id_modalevaluationselect" + student.studentId).value;
+					// se è stato inserito un voto
+					if(studentEvaluation !== ""){
+						//chiamo la servlet per la modifica del voto sul singolo studentId
+						makeCall("POST", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + student.studentId + "&evaluation=" + studentEvaluation, form,
+						    function(req) { // callback of the POST HTTP request
+						      if (req.readyState === 4) { // response has arrived
+						        let message = req.responseText; // get the body of the response
+						        if (req.status === 200) { // if no errors
+									//aggiorno la tabella degli studenti iscritti
+									registeredStudentsDetails.show(courseId, appealDate);
+						        } else {
+						          alertContainer.textContent = message; // report the error contained in the response body
+						        }
+						      }
+						    }
+						);
+					}
+				});
+				
+				//chiudo la pagina modale
+				multipleInsertionModal.style.display = "none";
+			}, false);
+			
+			document.querySelector("a[href='Logout']").addEventListener('click', () => {
+		        window.sessionStorage.removeItem('user');
+		    });
 			
 			/*	      
 					  missionDetails.registerEvents(this); // the orchestrator passes itself --this-- so that the wizard can call its refresh function after updating a mission
@@ -704,11 +846,7 @@
 		this.refresh = function(currentCourse) { // currentMission initially null at start
 			alertContainer.textContent = "";        // not null after creation of status change
 			coursesList.reset();
-			courseAppeals.reset();
-			coursesList.show(function() {
-				//coursesList.autoclick(currentMission); 
-			}); // closure preserves visibility of this
-			//wizard.reset();
+			coursesList.show();
 		};
 	}
 })();

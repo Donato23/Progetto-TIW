@@ -79,7 +79,7 @@ public class ModifyEvaluation extends HttpServlet {
 		String courseId = request.getParameter("courseId");
 		
 		if(sId == null || appealDate == null || courseId == null) {
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Missing parameters");
 			return;
 		}
@@ -212,10 +212,12 @@ public class ModifyEvaluation extends HttpServlet {
 		} catch (IllegalArgumentException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("PAR ERROR: Parameter is not valid");
+			return;
 		} catch (SQLException e) {
 			// throw new ServletException(e);
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getWriter().println("Failure in database extraction");
+			return;
 		}
 		
 		response.setStatus(HttpServletResponse.SC_OK);
