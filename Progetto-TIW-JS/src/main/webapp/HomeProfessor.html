@@ -11,23 +11,16 @@
 <script src="homeProfessor.js" charset="utf-8" defer></script>
 <script src="utils.js" charset="utf-8" defer></script>
 </head>
-<body>
-	<div id="logitem">
+<body class="page-transition">
+	<div id="logitem" style="visibility: hidden">
 		<div id="user">
 			<span id="id_nome"></span> <span id="id_cognome"></span>
 		</div>
 		<a class="button" href="Logout">Logout</a>
 	</div>
-	<!-- <h1>Welcome to the Professor's Home Page</h1>
-	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
-	<div id="id_alert" class="alertmessage"></div>	 -->
-	<div class="container">
+	<div id="page-container" class="container" style="visibility: hidden">
 		<div class="column">
 			<h1>Welcome to the Professor's Home Page</h1>
-			<!-- <p>
-				Nice to see you again <span id="id_nome"></span> <span
-					id="id_cognome"></span>
-			</p> -->
 			<div id="id_alert" class="alertmessage"> 
 			</div>
 			<table>
@@ -35,11 +28,12 @@
 					<td>
 						<h2>These are your courses:</h2>
 						<ul id="id_courses">
-							<!-- 					<li id="id_corso0"><a>analisi</a>
-						<ul>
-							<li><a>20/8/2023</a></li>
-						</ul>
-					</li> -->
+						<!-- contenuto dinamico
+							<li id="id_corso0"><a>analisi</a>
+						       <ul>
+									<li><a>20/8/2023</a></li>
+						       </ul>
+					        </li> -->
 						</ul>
 					</td>
 				</tr>
@@ -62,7 +56,8 @@
 								</tr>
 							</thead>
 							<tbody id="id_registeredstudentscontainerbody">
-								<!-- <tr>
+							<!--contenuto dinamico
+							<tr>
 							<td id="id_idnumber"></td>
 							<td id="id_name"></td>
 							<td id="id_surname"></td>
@@ -124,7 +119,7 @@
 										<th>Evaluation state</th>
 									</thead>
 									<tbody id="id_multipleinsertioncontainerbody">
-										<!-- 				    	 <tr>
+										<!--contenuto dinamico <tr>
 				    			<td>studentId</td>
 				    			<td>studentName</td>
 				    			<td>studentSurname</td>
@@ -150,7 +145,7 @@
 						</div>
 					</td>
 				</tr>
-				<tr id="id_reportdetailscontainer" class="boxed">
+				<tr id="id_reportdetailscontainer" class="boxed" style="visibility: hidden;">
 					<td>
 						<h2>New report created:</h2>
 						<h3>

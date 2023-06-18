@@ -188,7 +188,7 @@ public class ReportDAO {
 			if(studentData == null)
 				return null;
 			report.setStudentData(studentData);
-			
+			System.out.println(studentData);
 		} catch (SQLException e) {
 			return null;
 		} finally {
@@ -218,8 +218,9 @@ public class ReportDAO {
 		pstatement = con.prepareStatement(query);
 		pstatement.setInt(1, codiceVerbale);
 		result = pstatement.executeQuery();
-		
+		int i=0;
 		while(result.next()) {
+			i++;
 			studente = new User();
 			studente.setRuolo("studente");
 			studente.setMatricola(result.getInt("matricolastudente"));

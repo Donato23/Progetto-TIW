@@ -73,9 +73,12 @@
 				//anchor.idCorso= course.id; // make list item clickable
 				anchor.setAttribute('idCorso', course.id); // set a custom HTML attribute
 				anchor.addEventListener("click", (e) => {
+					document.getElementById("id_evaluationRejected").textContent="";
 					courseAppeals.listcontainer = e.target.parentNode;
 					// dependency via module parameter
+					
 					courseAppeals.show(e.target.getAttribute("idCorso")); // the list must know the details container
+					
 				}, false);
 				anchor.href = "#";
 				self.listcontainer.appendChild(listEl);
@@ -345,6 +348,8 @@
 			evaluationRejectedContainer.textContent="";        // not null after creation of status change
 			coursesList.reset();
 			courseAppeals.reset();
+			document.getElementById("page-container").style.visibility = "visible";
+			document.getElementById("logitem").style.visibility = "visible";
 			coursesList.show(function() {
 				//coursesList.autoclick(currentMission); 
 			}); // closure preserves visibility of this

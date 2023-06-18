@@ -38,5 +38,5 @@
     	 form.reportValidity();
     }
   });
-
+	document.getElementById("page-container").style.visibility = "visible";
 })();

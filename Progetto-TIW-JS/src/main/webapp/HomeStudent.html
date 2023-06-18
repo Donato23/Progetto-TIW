@@ -10,14 +10,14 @@
 <script src="homeStudent.js" charset="utf-8" defer></script>
 <script src="utils.js" charset="utf-8" defer></script>
 </head>
-<body>
-	<div id="logitem">
+<body class="page-transition">
+	<div id="logitem" style="visibility: hidden">
 		<div id="user">
 			<span id="id_nome"></span> <span id="id_cognome"></span>
 		</div>
 		<a class="button" href="Logout">Logout</a>
 	</div>
-	<div class="container">
+	<div id="page-container" class="container" style="visibility : hidden;">
 		<div class="column">
 			<h1>Welcome to the Student's Home Page</h1>
 			<div id="id_alert" class="alertmessage"></div>
@@ -89,10 +89,7 @@
 							<span id="id_evaluationRejected"></span>
 						</h3>
 					</td>
-				</tr>
-				
-				
-					
+				</tr>	
 			</table>
 		</div>
 

@@ -283,6 +283,7 @@
 							publishButton.style.visibility = "hidden";
 							reportButton.style.visibility = "hidden";
 							multipleInsertionButton.style.visibility = "hidden";
+							document.getElementById("id_reportdetailscontainer").style.visibility="hidden";
 							
 					        let form = e.target.closest("form"); // example of DOM navigation from event object
 					        if (form.checkValidity()) {
@@ -531,6 +532,10 @@
 		
 		this.update = function(report, courseId, appealDate){	
 			var self = this;
+			// Rimuovo le righe esistenti dalla tabella
+			while (self.reportContainerBody.firstChild) {
+				self.reportContainerBody.removeChild(self.reportContainerBody.firstChild);
+			}
 			
 			document.getElementById("id_reportnumber").textContent = report.id;
 			document.getElementById("id_reportdate").textContent = report.data;
@@ -779,6 +784,7 @@
 			multipleInsertionModal = document.getElementById("id_multipleinsertionmodal");
 			multipleInsertionModalPage = new ModalPage(alertContainer, document.getElementById("id_multipleinsertioncontainerbody"), document.getElementById("id_multipleinsertioncontainer"));
 			multipleInsertionButton.addEventListener("click", function(e){
+				document.getElementById("id_reportdetailscontainer").style.visibility="hidden";
 				let form = e.target.closest("form");
 				let appealDate = form.querySelector("input[type = 'hidden'][name = 'dataAppello']").value;
 				let courseId = form.querySelector("input[type = 'hidden'][name = 'idCorso']").value;
@@ -846,6 +852,8 @@
 		this.refresh = function(currentCourse) { // currentMission initially null at start
 			alertContainer.textContent = "";        // not null after creation of status change
 			coursesList.reset();
+			document.getElementById("page-container").style.visibility = "visible";
+			document.getElementById("logitem").style.visibility = "visible";
 			coursesList.show();
 		};
 	}
