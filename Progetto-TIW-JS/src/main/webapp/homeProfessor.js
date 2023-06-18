@@ -335,8 +335,8 @@
 							return -1; //valore nullo più piccolo di qualsiasi altro valore;
 						if (valueB == undefined)
 							return 1;
-
 						return valueA.localeCompare(valueB);
+						
 					} else {
 						if (valueA == undefined)
 							return -1; //valore nullo più piccolo di qualsiasi altro valore;
@@ -361,8 +361,8 @@
 							return 1; //valore nullo più piccolo di qualsiasi altro valore;
 						if (valueB == undefined)
 							return -1;
-
 						return valueB.localeCompare(valueA);
+						
 					} else {
 						if (valueA == undefined)
 							return 1; //valore nullo più piccolo di qualsiasi altro valore;
@@ -383,12 +383,12 @@
 
 			});
 
-			// Rimuovi le righe esistenti dalla tabella
+			// Rimuovo le righe esistenti dalla tabella
 			while (self.registeredstudentscontainerbody.firstChild) {
 				self.registeredstudentscontainerbody.removeChild(self.registeredstudentscontainerbody.firstChild);
 			}
 
-			// Aggiungi le righe ordinate alla tabella
+			// Aggiungo le righe ordinate alla tabella
 			rows.forEach(function(row) {
 				self.registeredstudentscontainerbody.appendChild(row);
 			});

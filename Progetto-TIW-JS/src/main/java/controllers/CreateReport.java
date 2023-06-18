@@ -206,7 +206,6 @@ public class CreateReport extends HttpServlet {
 		
 		if(newReport != null) {
 			json = new Gson().toJson(newReport.getId()); 
-			System.out.println("sono qui");
 		}
 		
 		response.setStatus(HttpServletResponse.SC_OK);

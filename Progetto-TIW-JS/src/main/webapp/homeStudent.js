@@ -155,6 +155,7 @@
 				anchor.setAttribute('appealdate', appeal.data); // set a custom HTML attribute
 				anchor.addEventListener("click", (e) => {
 					// MOSTRO la valutazione
+					document.getElementById("id_evaluationRejected").textContent="";
 					evaluationDetails.show(self.idCorso, appeal.data);
 				}, false);
 				anchor.href = "#";
@@ -231,9 +232,9 @@
 			if(evaluationData.mark == undefined){
 				this.evaluationContainer.style.visibility = "hidden";
 				rejectButton.style.visibility = "hidden";
-				this.appealResult = new PersonalMessage("Evaluation for the "+evaluationData.dataAppello+" appeal not yet defined",
-					document.getElementById("id_appealresult"));
-				this.appealResult.show();
+				var noEvaluationMessage = new PersonalMessage("Evaluation for the "+evaluationData.dataAppello+" appeal not yet defined",
+					this.alert);
+				noEvaluationMessage.show();
 				
 			}else {
 			
@@ -283,7 +284,7 @@
 
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
-
+		var evaluationRejectedContainer = document.getElementById("id_evaluationRejected");
 		this.start = function() {
 			let personalMessageName = new PersonalMessage(JSON.parse(sessionStorage.getItem('user')).nome,
 				document.getElementById("id_nome"));
@@ -315,7 +316,7 @@
 			            let message = req.responseText; 
 			            if (req.status === 200) { 
 			              evaluationDetails.show(courseId, appealDate);
-			              let rejectionMessage = new PersonalMessage("The evaluation has been rejected ", alertContainer);
+			              let rejectionMessage = new PersonalMessage("The evaluation has been rejected ", document.getElementById("id_evaluationRejected"));
 			              rejectionMessage.show();
 			            } else {
 			              alertContainer.textContent = message;
@@ -340,7 +341,8 @@
 		};
 
 		this.refresh = function(currentCourse) { // currentCourse initially null at start
-			alertContainer.textContent = "";        // not null after creation of status change
+			alertContainer.textContent = "";
+			evaluationRejectedContainer.textContent="";        // not null after creation of status change
 			coursesList.reset();
 			courseAppeals.reset();
 			coursesList.show(function() {

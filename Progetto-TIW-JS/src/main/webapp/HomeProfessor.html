@@ -4,49 +4,65 @@
 <meta charset="UTF-8">
 <title>Professor's home</title>
 <link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+<!--  media="all" -->
 <script src="homeProfessor.js" charset="utf-8" defer></script>
 <script src="utils.js" charset="utf-8" defer></script>
 </head>
 <body>
-<div align="right">
-	<a href="Logout">Logout</a>
-</div>
-<h1>Welcome to the Professor's Home Page</h1>
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome"></span> <span id="id_cognome"></span>
+		</div>
+		<a class="button" href="Logout">Logout</a>
+	</div>
+	<!-- <h1>Welcome to the Professor's Home Page</h1>
 	<p>Nice to see you again <span id="id_nome"></span> <span id="id_cognome"></span></p>
-	<div id="id_alert" class="alertmessage"></div>	
-	<table>
-		<tr>
-			<td>
-				<p>These are your courses:</p>
-				<ul id="id_courses">
-<!-- 					<li id="id_corso0"><a>analisi</a>
+	<div id="id_alert" class="alertmessage"></div>	 -->
+	<div class="container">
+		<div class="column">
+			<h1>Welcome to the Professor's Home Page</h1>
+			<!-- <p>
+				Nice to see you again <span id="id_nome"></span> <span
+					id="id_cognome"></span>
+			</p> -->
+			<div id="id_alert" class="alertmessage"> 
+			</div>
+			<table>
+				<tr>
+					<td>
+						<h2>These are your courses:</h2>
+						<ul id="id_courses">
+							<!-- 					<li id="id_corso0"><a>analisi</a>
 						<ul>
 							<li><a>20/8/2023</a></li>
 						</ul>
 					</li> -->
-				</ul>				
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p>
-					<span id="id_registeredstudentsstring"></span>
-				</p>
-				<table id="id_registeredstudentscontainer" class="boxed"
-					style="visibility: hidden;">
-					<thead>
-						<tr>
-							<th class="column-label"><a href="#" data-column="idNumber">Id number</a></th>
-							<th class="column-label"><a href="#" data-column="name">Name</a></th>
-							<th class="column-label"><a href="#" data-column="surname">Surname</a></th>
-							<th class="column-label"><a href="#" data-column="email">E-mail</a></th>
-							<th class="column-label"><a href="#" data-column="degree">Degree</a></th>
-							<th class="column-label"><a href="#" data-column="mark">Mark</a></th>
-							<th class="column-label"><a href="#" data-column="evaluationState">Evaluation state</a></th>
-						</tr>
-					</thead>
-					<tbody id="id_registeredstudentscontainerbody">
-						<!-- <tr>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<h3>
+							<span id="id_registeredstudentsstring"></span>
+						</h3>
+						<table id="id_registeredstudentscontainer" class="boxed"
+							style="visibility: hidden;">
+							<thead>
+								<tr>
+									<th class="column-label"><a href="#"data-column="idNumber">Id number</a></th>
+									<th class="column-label"><a href="#" data-column="name">Name</a></th>
+									<th class="column-label"><a href="#" data-column="surname">Surname</a></th>
+									<th class="column-label"><a href="#" data-column="email">E-mail</a></th>
+									<th class="column-label"><a href="#" data-column="degree">Degree</a></th>
+									<th class="column-label"><a href="#" data-column="mark">Mark</a></th>
+									<th class="column-label"><a href="#"data-column="evaluationState">Evaluation state</a></th>
+								</tr>
+							</thead>
+							<tbody id="id_registeredstudentscontainerbody">
+								<!-- <tr>
 							<td id="id_idnumber"></td>
 							<td id="id_name"></td>
 							<td id="id_surname"></td>
@@ -63,52 +79,52 @@
 							 	</form>	
 							</td>
 						</tr> -->
-					</tbody>
-				</table>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<form id="id_publishbutton" action="#">
-					<input type="hidden" name="appealDate"></input> <input
-						type="hidden" name="courseId"></input> <input type="button"
-						name="publish" value="Publish"></input>
-				</form>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<form id="id_createreportbutton" action="#">
-					<input type="hidden" name="dataAppello"></input>
-					<input type="hidden" name="idCorso"></input>
-					<input type="button" name="createreport" value="Create report"></input>
-				</form>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<form id="id_multipleinsertionbutton" action="#">
-					<input type="hidden" name="dataAppello"></input>
-					<input type="hidden" name="idCorso"></input>
-					<input type="button" name="multipleinsertion" value="Multiple insertion"></input>
-				</form>
-				<div id="id_multipleinsertionmodal" class="modal">	
-				  <!-- Modal content -->
-				  <div class="modal-content">
-				    <span class="close">&times;</span>
-				    <p>Insert multiple evaluations:</p>
-				    <table id="id_multipleinsertioncontainer">
-				    	<thead>
-				    		<th>Id number</th>
-				    		<th>Name</th>
-				    		<th>Surname</th>
-				    		<th>E-mail</th>
-				    		<th>Degree</th>
-				    		<th>Mark</th>
-				    		<th>Evaluation state</th>
-				    	</thead>
-				    	<tbody id="id_multipleinsertioncontainerbody">
-<!-- 				    	 <tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+				<tr id="buttonrow">
+					<td>
+						<form  id="id_publishbutton" action="#">
+							<input type="hidden" name="appealDate"></input> 
+							<input type="hidden" name="courseId"></input> 
+							<input class="button" type="button"name="publish" value="Publish"></input>
+						</form>
+					</td>
+					<td>
+						<form id="id_createreportbutton" action="#">
+							<input type="hidden" name="dataAppello"></input> 
+							<input type="hidden" name="idCorso"></input> 
+							<input class="button" type="button" name="createreport" value="Create report"></input>
+						</form>
+					</td>
+					<td>
+						<form id="id_multipleinsertionbutton" action="#">
+							<input type="hidden" name="dataAppello"></input> 
+							<input type="hidden" name="idCorso"></input>
+							<input class="button" type="button" name="multipleinsertion" value="Multiple insertion"></input>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div id="id_multipleinsertionmodal" class="modal">
+							<!-- Modal content -->
+							<div class="modal-content">
+								<span class="close">&times;</span>
+								<p>Insert multiple evaluations:</p>
+								<table id="id_multipleinsertioncontainer">
+									<thead>
+										<th>Id number</th>
+										<th>Name</th>
+										<th>Surname</th>
+										<th>E-mail</th>
+										<th>Degree</th>
+										<th>Mark</th>
+										<th>Evaluation state</th>
+									</thead>
+									<tbody id="id_multipleinsertioncontainerbody">
+										<!-- 				    	 <tr>
 				    			<td>studentId</td>
 				    			<td>studentName</td>
 				    			<td>studentSurname</td>
@@ -123,72 +139,95 @@
 				    				</form>
 				    			</td>
 				    		</tr> -->
-				    	</tbody>
-				    </table>
-				    
-				    <form id="id_multipleinsertionsubmitbutton" action="#">
-					    <input type="hidden" name="appealDate"></input>
-						<input type="hidden" name="courseId"></input>
-						<input type="button" name="multipleinsertionsend" value="Send"></input>
-					</form>
-				  </div>
-				</div>
-			</td>
-		</tr>
-		<tr id="id_studentdetailscontainer" style="visibility: hidden;">
-			<td>
-				<h2>Student details:</h2>
-				<p>Student ID: <span id="id_studentid"></span></p>
-				<p>Name: <span id="id_studentname"></span></p>
-				<p>Surname: <span id="id_studentsurname"></span></p>
-				<p>E-Mail: <span id="id_studentemail"></span></p>
-				<p>Degree course: <span id="id_studentdegreecourse"></span></p>
-				<h3>Insert the evaluation below:</h3>
-					<form id="id_modifyevaluationform" action="#">
-						<select name="evaluation">
-							<option></option>
-							<option>ASSENTE</option>
-							<option>RIMANDATO</option>
-							<option>RIPROVATO</option>
-							<option>18</option>
-							<option>19</option>
-							<option>20</option>
-							<option>21</option>
-							<option>22</option>
-							<option>23</option>
-							<option>24</option>
-							<option>25</option>
-							<option>26</option>
-							<option>27</option>
-							<option>28</option>
-							<option>29</option>
-							<option>30</option>
-							<option>30L</option>
-						</select> <br> 
-						<input id="id_modifyevaluationbutton" type="button" name="submit" value="Submit changes">
-					</form>
-			</td>
-		</tr>
-		<tr id="id_reportdetailscontainer">
-			<td>
-				<h2>New report created:</h2>
-				<h3>Report N. <span id="id_reportnumber"></span></h3>
-				<h4>Date: <span id="id_reportdate"></span> H: <span id="id_reporttime"></span></h4>
-				<h4>CourseID: <span id="id_reportcourseid"></span> Appeal of <span id="id_reportappealdate"></span></h4>
-				<table>
-					<thead>
-						<tr>
-							<th>STUDENT ID</th>
-							<th>NAME</th>
-							<th>SURNAME</th>
-							<th>MARK</th>
-						</tr>
-					</thead>
-					<tbody id="id_reportstudentdetailscontainerbody">
-					</tbody>
-				</table>
-			</td>
-		</tr>
-	</table>
+									</tbody>
+								</table>
+								<form id="id_multipleinsertionsubmitbutton" action="#">
+									<input type="hidden" name="appealDate"></input> <input
+										type="hidden" name="courseId"></input> <input type="button"
+										name="multipleinsertionsend" value="Send"></input>
+								</form>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr id="id_reportdetailscontainer" class="boxed">
+					<td>
+						<h2>New report created:</h2>
+						<h3>
+							Report N. <span id="id_reportnumber"></span>
+						</h3>
+						<h4>
+							Date: <span id="id_reportdate"></span> H: <span
+								id="id_reporttime"></span>
+						</h4>
+						<h4>
+							CourseID: <span id="id_reportcourseid"></span> Appeal of <span
+								id="id_reportappealdate"></span>
+						</h4>
+						<table>
+							<thead>
+								<tr>
+									<th>STUDENT ID</th>
+									<th>NAME</th>
+									<th>SURNAME</th>
+									<th>MARK</th>
+								</tr>
+							</thead>
+							<tbody id="id_reportstudentdetailscontainerbody">
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="column">
+			<table>
+				<tr id="id_studentdetailscontainer" style="visibility: hidden;">
+					<td>
+						<h2>Student details:</h2>
+						<p>
+							Student ID: <span id="id_studentid"></span>
+						</p>
+						<p>
+							Name: <span id="id_studentname"></span>
+						</p>
+						<p>
+							Surname: <span id="id_studentsurname"></span>
+						</p>
+						<p>
+							E-Mail: <span id="id_studentemail"></span>
+						</p>
+						<p>
+							Degree course: <span id="id_studentdegreecourse"></span>
+						</p>
+						<h3>Insert the evaluation below:</h3>
+						<form id="id_modifyevaluationform" action="#">
+							<select class="button" name="evaluation">
+								<option></option>
+								<option>ASSENTE</option>
+								<option>RIMANDATO</option>
+								<option>RIPROVATO</option>
+								<option>18</option>
+								<option>19</option>
+								<option>20</option>
+								<option>21</option>
+								<option>22</option>
+								<option>23</option>
+								<option>24</option>
+								<option>25</option>
+								<option>26</option>
+								<option>27</option>
+								<option>28</option>
+								<option>29</option>
+								<option>30</option>
+								<option>30L</option>
+							</select> <br> <input id="id_modifyevaluationbutton" type="button"
+								name="submit" value="Submit changes">
+						</form>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </body>
 </html>

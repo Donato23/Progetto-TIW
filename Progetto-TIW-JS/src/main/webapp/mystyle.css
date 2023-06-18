@@ -1,12 +1,145 @@
+/* .container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; Due colonne con la stessa larghezza
+  grid-gap: 20px; Spazio tra le colonne
+}
+
+
+.column table {
+  width: 100%; La tabella occupa tutta la larghezza della colonna
+} */
+body{
+	background-color: aliceblue;
+}
 .boxed {
-	border: 1px solid black;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: lightblue;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);;
+}
+.button{
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.button:hover {
+  /* background-color: #1f5f89; */
+  background-color: #2980b9;
+}
+#login-text{
+	color: #2980b9;
+}
+.login-form{
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+} 
+.input-container {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+label {
+  margin-right: 10px;
+}
+input[type="button"][name="Modify"]{
+  display: inline-block;
+  padding: 8px 8px;
+  font-size: 12px;
+  text-align: center;
+  text-decoration: none;
+  background-color: #3498db;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+input[type="button"][name="Modify"]:hover{
+	background-color: #2980b9;
+	}
+	
+#buttonrow{
+	display: flex;
+}
+a[data-column]{
+	color: #3498db;
+	text-decoration: none;
+}
+a[data-column]:hover{
+	color: #2980b9
+}
+
+li a{
+	text-decoration: none;
+	color: #3498db;
+	font-size: medium;
+	font-weight: bolder
+}
+li a:hover{
+	color: #2980b9;
+}
+/* #id_registeredstudentscontainer {
+	visibility: visible;
+	background-color: lightblue;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+} */
+
+#id_reportdetailscontainer{
+	visibility: visible;
+	background-color: lightblue;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	margin: 10px;
+    text-align: center;
+}
+
+#id_modifyevaluationbutton{
+  display: inline-block;
+  padding: 8px 8px;
+  font-size: 12px;
+  text-align: center;
+  text-decoration: none;
+  background-color: #3498db;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 5px;
+}
+#id_modifyevaluationbutton:hover{
+	background-color: #2980b9;
+}
+
+#id_modifyevaluationform{
+	display: flex;
+}
+option{
+	/* background-color: lightblue; */
+	font-size: 12px;
 }
 
 th.sortable {
 	cursor: pointer;
 }
+td, th {
+  padding: 10px;
+}
 
 .alertmessage{
+	text-align: center;
+	padding-top: 5px;
 	color: red;
 	visibility: visible;
 }
@@ -49,3 +182,54 @@ th.sortable {
   text-decoration: none;
   cursor: pointer;
 }
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  margin-top: 60px;
+  
+}
+
+.column {
+  flex-direction: column;
+  width: auto;
+  margin-right: 100px;
+}
+#logitem {
+	display: flex;
+	justify-content: space-between;
+	font-family: 'Inter', sans-serif;
+	padding-right: 5px;
+	background-color: #3498db;
+	/* background-color: lightblue; */
+	padding: 10px;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 9999;}
+
+#user{
+	padding-right: 5px;
+	font-size: 20px;
+	color: white;
+}
+/* .container {
+  display: flex;
+}
+
+.column {
+  flex-basis: 33.33%; o una larghezza fissa desiderata
+  flex-grow: 0;
+} */
+/* .container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.column {
+  flex: 1;
+} */
+
