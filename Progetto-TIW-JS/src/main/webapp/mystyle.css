@@ -193,9 +193,11 @@ td, th {
 }
 
 .column {
+  display: flex;
   flex-direction: column;
   width: auto;
   margin-right: 100px;
+  align-items: center;
 }
 #logitem {
 	display: flex;

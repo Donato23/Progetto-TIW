@@ -188,7 +188,6 @@ public class ReportDAO {
 			if(studentData == null)
 				return null;
 			report.setStudentData(studentData);
-			System.out.println(studentData);
 		} catch (SQLException e) {
 			return null;
 		} finally {
