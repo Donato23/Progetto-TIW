@@ -248,7 +248,7 @@
 				rejectButton.querySelector("input[type = 'hidden'][name = 'appealDate']").value = evaluationData.dataAppello;
 			    rejectButton.querySelector("input[type = 'hidden'][name = 'courseId']").value = evaluationData.idCorso;
 			    
-				this.appealResult = new PersonalMessage("These is your result for the " + evaluationData.dataAppello + " appeal:",
+				this.appealResult = new PersonalMessage("This is your result for the " + evaluationData.dataAppello + " appeal:",
 					document.getElementById("id_appealresult"));
 				this.appealResult.show();
 				
