@@ -1,7 +1,7 @@
 (function(){// avoid variables ending up in the global scope
 	let pageOrchestrator = new PageOrchestrator();
 	let coursesList, courseAppeals, registeredStudentsDetails, singleStudentDetails, reportDetails, multipleInsertionModalPage;
-	let publishButton, reportButton, multipleInsertionButton, sendMultipleInsertionButton;
+	let publishButton, reportButton, multipleInsertionButton, sendMultipleInsertionButton,submitButton;
 	let multipleInsertionModal;
 
 	window.addEventListener("load", () => {
@@ -290,7 +290,7 @@
 					          let appealDate = form.querySelector("input[type = 'hidden'][name = 'appealDate']").value;
 					          let courseId = form.querySelector("input[type = 'hidden'][name = 'courseId']").value;
 					          let studentId = form.querySelector("input[type = 'hidden'][name = 'studentId']").value;
-					          
+					          console.log(studentId);
 					          e.preventDefault();
 					          
 					          makeCall("GET", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + studentId, form,
@@ -472,16 +472,26 @@
 			document.getElementById("id_studentsurname").textContent = studentDetails.cognome;
 			document.getElementById("id_studentemail").textContent = studentDetails.mail;
 			document.getElementById("id_studentdegreecourse").textContent = studentDetails.corsoDiLaurea;
+			if(submitButton!=undefined){
+				document.getElementById("id_modifyevaluationform").removeChild(submitButton);
+			}
+			submitButton = document.createElement("input");
+			submitButton.setAttribute("type", "button");
+			submitButton.setAttribute("name", "submit");
+			submitButton.setAttribute("value", "submit changes");
+			submitButton.setAttribute("id","id_modifyevaluationbutton");
+			document.getElementById("id_modifyevaluationform").appendChild(submitButton);
 			
 			// adding event listener for evaluation submit
-			document.getElementById("id_modifyevaluationbutton").addEventListener("click", function(e){
+			//document.getElementById("id_modifyevaluationbutton")
+			submitButton.addEventListener("click", function(e){
 				let form = e.target.closest("form"); // example of DOM navigation from event object
 			    if (form.checkValidity()){
 			      let newEvaluation = form.querySelector("select[name = 'evaluation']").value;
-			      
+			      //let dataAppello = form.querySelector("select[name = 'evaluation']").value
 			      e.preventDefault();
-			      
-			      makeCall("POST", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + studentId + "&evaluation=" + newEvaluation, form,
+			      console.log("prima post: "+studentDetails.matricola);
+			      makeCall("POST", "ModifyEvaluation?appealDate=" + appealDate + "&courseId=" + courseId + "&studentId=" + studentDetails.matricola + "&evaluation=" + newEvaluation, form,
 			        function(req) { // callback of the POST HTTP request
 			          if (req.readyState === 4) { // response has arrived
 			            let message = req.responseText; // get the body of the response
