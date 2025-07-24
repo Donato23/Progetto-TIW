@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>New Report</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome" th:text="${session.user.nome}"></span> <span id="id_cognome" th:text="${session.user.cognome}"></span>
+		</div>
+		<div>
+			<a class="button" th:href="@{/Logout}">Logout</a>
+			<a class="button" th:href="@{/GoToHomeProfessor}" th:text="'Back home'">Back to the Home page</a>
+		</div>
+	</div>
+	<div id="page-container" class="container">
+		<div class="column">
+			<div id="id_alert" class="alertmessage" th:if="${alertMessage!=null}"
+				th:text="${alertMessage}"></div>
+			<div th:if="${alertMessage==null}">
+				<h2>New report created :</h2>
+				<h2 th:text="'Report N.'+ ${report.id}"></h2>
+				<br>
+				<h3 th:text="'Date: '+${report.data}+' H: '+${report.ora}"></h3>
+				<h3
+					th:text="'CourseID: '+ ${appello.idCorso} +'  Appeal of ' + ${appello.data}"></h3>
+				<br>
+				<!-- <div>
+				<table>
+					<tr>
+						<td> -->
+				<table id="id_reportdetailscontainer" class="boxed"
+					th:if=" ${not #maps.isEmpty(report.studentData)}">
+					<thead>
+						<tr>
+							<th>STUDENT_ID</th>
+							<th>NAME</th>
+							<th>SURNAME</th>
+							<th>MARK</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="s : ${report.studentData}">
+							<td th:text="${s.key.matricola}">studentID</td>
+							<td th:text="${s.key.nome}">name</td>
+							<td th:text="${s.key.cognome}">surname</td>
+							<td th:text="${s.value}">mark</td>
+						</tr>
+					</tbody>
+				</table>
+				<div class="alertmessage"
+					th:if="${#maps.isEmpty(report.studentData)}">There is no
+					verbal data</div>
+			</div>
+
+			<!-- </td>
+					</tr>
+				</table>
+			</div> -->
+		</div>
+	</div>
+</body>
+</html>

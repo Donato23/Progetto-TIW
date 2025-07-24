@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Publish evaluation</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome" th:text="${session.user.nome}"></span> <span id="id_cognome" th:text="${session.user.cognome}"></span>
+		</div>
+		<div>
+			<a class="button" th:href="@{/Logout}">Logout</a>
+			<a class="button" th:href="@{/GoToHomeProfessor}" th:text="'Back home'">Back to the Home page</a>
+		</div>
+	</div>
+	<div id="page-container" class="container">
+		<div class="column">
+			<div id="id_alert" class="alertmessage" th:if="${alertMessage!=null}" th:text="${alertMessage}" ></div>
+			<div th:if="${alertMessage==null}">
+				<h2>Student details:</h2>
+				<p th:text="'Student ID: ' + ${student.matricola}"></p>
+				<p th:text="'Name: ' + ${student.nome}"></p>
+				<p th:text="'Surname: ' + ${student.cognome}"></p>
+				<p th:text="'E-mail: ' + ${student.mail}"></p>
+				<p th:text="'Degree course: ' + ${student.corsoDiLaurea}"></p>
+				<h3>Insert the evaluation below:</h3>
+				<form id="id_modifyevaluationform"
+					th:href="@{/ModifyEvaluation(appealDate=${appealDate}, courseId=${courseId}, studentId=${student.matricola})}"
+					method="POST">
+					<select class="button" name="evaluation">
+						<option></option>
+						<option>ASSENTE</option>
+						<option>RIMANDATO</option>
+						<option>RIPROVATO</option>
+						<option>18</option>
+						<option>19</option>
+						<option>20</option>
+						<option>21</option>
+						<option>22</option>
+						<option>23</option>
+						<option>24</option>
+						<option>25</option>
+						<option>26</option>
+						<option>27</option>
+						<option>28</option>
+						<option>29</option>
+						<option>30</option>
+						<option>30L</option>
+					</select> <br> <input class="modifyevaluationbutton" type="submit"
+						name="submit" value="Submit changes">
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

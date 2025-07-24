@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Evaluation</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome" th:text="${session.user.nome}"></span> <span id="id_cognome" th:text="${session.user.cognome}"></span>
+		</div>
+		<div>
+			<a class="button" th:href="@{/Logout}">Logout</a>
+			<a class="button" th:href="@{/GoToHomeStudent}" th:text="'Back home'">Back to the Home page</a>
+		</div>
+	</div>
+	<div id="page-container" class="container">
+		<div class="column">
+			<div id="id_alert" class="alertmessage" th:if="${alertMessage!=null}" th:text="${alertMessage}" ></div>
+			<div th:if="${alertMessage==null}">
+				<h2>This is your result for the selected appeal</h2>
+				<table>
+					<tr>
+						<td th:if="${mark != null}">
+							<table id="id_evaluationcontainer" class="boxed">
+								<thead>
+									<tr>
+										<th>USER_ID</th>
+										<th>NAME</th>
+										<th>SURNAME</th>
+										<th>COURSE</th>
+										<th>APPEAL</th>
+										<th>MARK</th>
+										<th>STATE</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td th:text="${session.user.matricola}">userId</td>
+										<td th:text="${session.user.nome}">name</td>
+										<td th:text="${session.user.cognome}">surname</td>
+										<td th:text="${corso.nome}">course</td>
+										<td th:text="${appello.data}">appeal</td>
+										<td th:text="${mark.mark}">mark</td>
+										<td th:text="${mark.statovalutazione}">state</td>
+										<td th:if="${mark.rejectable()}"><a
+											href="Evaluation.html"
+											th:href="@{/RejectEvaluation(idCorso=${appello.idCorso},dataAppello=${appello.data})}">
+												<button class="button" th:text="REJECT">button</button>
+										</a></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="alertmessage"
+								th:if="${mark.statovalutazione.toString()=='RIFIUTATO'}"
+								th:text="'Evaluation has been rejected'"></div>
+						</td>
+						<td>
+							<div class="alertmessage" th:if="${mark == null}"
+								th:text="'Evaluation not yet defined'"></div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

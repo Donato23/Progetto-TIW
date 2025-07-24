@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Login page</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="page-container" class="container"  style="flex-direction: column;" >
+		<h1 id="login-text">Enter here your credentials</h1>
+		<br>
+		<form action="Login" method="POST" class="login-form">
+			<div class="input-container">
+				<label for="username">Username</label> 
+				<input type="text" name="userid"> <br>
+			</div>
+			<div class="input-container">
+				<label for="password">Password</label> 
+				<input type="password" name="pwd"><br>
+			</div>
+			<input class="button" type="submit" value="login" id="loginbutton">
+		</form>
+	</div>
+	<div id="errormessage" class="alertmessage"></div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Registered Students</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome" th:text="${session.user.nome}"></span> <span id="id_cognome" th:text="${session.user.cognome}"></span>
+		</div>
+		<div>
+			<a class="button" th:href="@{/Logout}">Logout</a>
+			<a class="button" th:href="@{/GoToHomeProfessor}" th:text="'Back home'">Back to the Home page</a>
+		</div>
+	</div>
+	<div id="page-container" class="container">
+		<div class="column">
+			<div id="id_alert" class="alertmessage" th:if="${alertMessage!=null}" th:text="${alertMessage}" ></div>
+			<h2 th:if="${alertMessage==null}">
+				These are the students registered to the <span
+					th:text="${appealDate}"></span> appeal:
+			</h2>
+			<table>
+				<tr>
+					<td>
+						<table id="id_registeredstudentscontainer" class="boxed"
+							th:if="${not #maps.isEmpty(registeredStudentsEvaluations)}">
+							<thead>
+								<tr>
+									<th th:if="${order=='DESC'} or not ${sortBy=='matricola'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='matricola',order='ASC')}">Id
+											number</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='matricola'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='matricola',order='DESC')}">Id
+											number</a></th>
+									<th th:if="${order=='DESC'} or not ${sortBy=='nome'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='nome',order='ASC')}">Name</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='nome'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='nome',order='DESC')}">Name</a>
+									</th>
+									<th th:if="${order=='DESC'} or not ${sortBy=='cognome'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='cognome',order='ASC')}">Surname</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='cognome'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='cognome',order='DESC')}">Surname</a>
+									</th>
+									<th th:if="${order=='DESC'} or not ${sortBy=='email'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='email',order='ASC')}">E-mail</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='email'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='email',order='DESC')}">E-mail</a>
+									</th>
+									<th th:if="${order=='DESC'} or not ${sortBy=='corsodilaurea'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='corsodilaurea',order='ASC')}">Degree</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='corsodilaurea'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='corsodilaurea',order='DESC')}">Degree</a>
+									</th>
+									<th th:if="${order=='DESC'} or not ${sortBy=='voto'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='voto',order='ASC')}">Mark</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='voto'}"><a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='voto',order='DESC')}">Mark</a>
+									</th>
+									<th
+										th:if="${order=='DESC'} or not ${sortBy=='statovalutazione'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='statovalutazione',order='ASC')}">Evaluation
+											state</a>
+									</th>
+									<th th:if="${order=='ASC'} and ${sortBy=='statovalutazione'}">
+										<a
+										th:href="@{/GetRegisteredStudentsByAppeal(dataAppello=${appealDate},idCorso=${courseId},sortBy='statovalutazione',order='DESC')}">Evaluation
+											state</a>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="s : ${registeredStudentsEvaluations}">
+									<td th:text="${s.key.matricola}"></td>
+									<td th:text="${s.key.nome}"></td>
+									<td th:text="${s.key.cognome}"></td>
+									<td th:text="${s.key.mail}"></td>
+									<td th:text="${s.key.corsoDiLaurea}"></td>
+									<td th:text="${s.value.mark}"></td>
+									<td th:text="${s.value.statoValutazione}"></td>
+									<td
+										th:if="${s.value.statovalutazione.toString()=='INSERITO'} or ${s.value.statovalutazione.toString()=='NON_INSERITO'}">
+										<form th:action="@{/ModifyEvaluation}" method="get">
+											<input type="hidden" name="appealDate"
+												th:value="${appealDate}"> <input type="hidden"
+												name="courseId" th:value="${courseId}"> <input
+												type="hidden" name="studentId" th:value="${s.key.matricola}">
+											<input class="modifyevaluationbutton" type="submit"
+												name="modify-submit" value="Modify">
+										</form>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+					<td>
+						<div class="alertmessage"
+							th:if="${#maps.isEmpty(registeredStudentsEvaluations)} and ${alertMessage==null}">
+							There are no registered students for this appeal</div>
+					</td>
+				</tr>
+			</table>
+			<div id="buttonrow">
+				<div th:if="${not #maps.isEmpty(registeredStudentsEvaluations)}">
+					<form id="id_publishbutton"
+						th:action="@{/PublishEvaluation(appealDate=${appealDate}, courseId=${courseId})}"
+						method="post">
+						<input class="button" type="submit" name="publish-submit"
+							value="Publish">
+					</form>
+				</div>
+				<div th:if="${not #maps.isEmpty(registeredStudentsEvaluations)}">
+					<form id="id_createreportbutton" 
+						th:action="@{/CreateReport(dataAppello=${appealDate}, idCorso=${courseId})}"
+						method="post">
+						<input class="button" type="submit" name="submit" value="Report">
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+</html>

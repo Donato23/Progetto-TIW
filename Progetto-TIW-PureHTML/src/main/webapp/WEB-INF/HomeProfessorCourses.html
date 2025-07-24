@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Professor's home</title>
+<link rel="stylesheet" type="text/css" media="all" href="mystyle.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="page-transition">
+	<div id="logitem">
+		<div id="user">
+			<span id="id_nome" th:text="${session.user.nome}"></span> <span id="id_cognome" th:text="${session.user.cognome}"></span>
+		</div>
+		<a class="button" th:href="@{/Logout}">Logout</a>
+	</div>
+	<div id="page-container" class="container">
+		<div class="column">
+			<h1>Welcome to the Professor's home page</h1>
+			<div id="id_alert" class="alertmessage"> </div>
+			<h2>These are your courses:</h2>
+			<ul>
+				<li th:each="c : ${courses}">
+					<!-- <span th:text="${a.idCorso} :"></span> --> 
+					<a 
+					   th:href="@{/GoToHomeProfessorAppeals(idCorso=${c.id})}"
+					   th:text="${c.nome}">
+				    </a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
