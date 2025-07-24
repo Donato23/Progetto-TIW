@@ -2,32 +2,32 @@
 
 Progetto d’esame per il corso Tecnologie Informatiche per il Web, con due versioni distinte:
 
-    Versione HTML pura: navigazione a pagine statiche per la gestione degli esiti.
+- Versione HTML pura: navigazione a pagine statiche per la gestione degli esiti.
 
-    Versione RIA (Rich Internet Application): interfaccia dinamica con JavaScript e chiamate asincrone al server.
+- Versione RIA (Rich Internet Application): interfaccia dinamica con JavaScript e chiamate asincrone al server.
 
 ## 👤 Funzionalità Docente
 
-    Login e selezione corso e appello.
+- Login e selezione corso e appello.
 
-    Visualizzazione e ordinamento iscritti per colonna.
+- Visualizzazione e ordinamento iscritti per colonna.
 
-    Inserimento, modifica, pubblicazione e verbalizzazione voti.
+- Inserimento, modifica, pubblicazione e verbalizzazione voti.
 
-    Generazione del verbale con dati studenti e appello.
+- Generazione del verbale con dati studenti e appello.
 
 ## 🎓 Funzionalità Studente
 
-    Login e selezione appello.
+- Login e selezione appello.
 
-    Visualizzazione dell’esito.
+- Visualizzazione dell’esito.
 
-    Possibilità di rifiutare il voto (se accettabile).
+- Possibilità di rifiutare il voto (se accettabile).
 
 ## ⚙️ Versione RIA (JS)
 
-    Applicazione single-page.
+- Applicazione single-page.
 
-    Aggiornamento dinamico dei contenuti.
+- Aggiornamento dinamico dei contenuti.
 
-    Inserimento multiplo dei voti tramite modale.
+- Inserimento multiplo dei voti tramite modale.
